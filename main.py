@@ -26,9 +26,7 @@ def TestGameLoading():
     g = Game()
     g.LoadTerrains()
     g.LoadObjects()
-    for t in g.Terrains:
-        print(t.__dict__())
-    for obj in g.Objects:
-        print(obj.__dict__())
+    g.LoadMaps()
+    open("gamedump.txt","w").write((json.dumps(g.__dict__(), indent="    ")))
 
 TestGameLoading()

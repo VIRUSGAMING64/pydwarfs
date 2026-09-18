@@ -1,7 +1,8 @@
 from modules.game.terrains import *
 from modules.game.objects import *
+from modules.game.map import *
 
-from modules.game.map import Map
+from modules.game.map import GameMap
 import logging
 import os
 logging.basicConfig(level=logging.DEBUG)
@@ -16,7 +17,7 @@ class Game:
     o_path = DEFAULT_O_PATH
     Terrains:list[GameTerrain] = []
     Objects:list[GameObject] = []
-    Maps:list[Map] = []
+    Maps:list[GameMap] = []
     def __init__(self, m_path = DEFAULT_M_PATH, t_path = DEFAULT_T_PATH, o_path = DEFAULT_O_PATH):
         os.makedirs(m_path, exist_ok=True)
         os.makedirs(t_path, exist_ok=True)
@@ -38,7 +39,7 @@ class Game:
             lines = [] 
             with open(pth, "rb") as file:
                 buff = file.read()
-                base = GameBaseTerrain()  
+                base = GameTerrainBuilder()  
                 if base.Initialize(buff):
                     self.Terrains.append(base.ToTerrain())
 
@@ -52,9 +53,41 @@ class Game:
             if not pth.endswith(".ob"):
                 continue
             pth = os.path.join(self.o_path, pth)
-            logging.debug(f"paths: [{pth}]")
             with open(pth, "rb") as file:
                 buff = file.read()
-                base = GameBaseObject()
+                base = GameObjectBuilder()
                 if base.Initialize(buff):
                     self.Objects.append(base.ToObject())
+
+    def LoadMaps(self):
+        try:
+            data = os.listdir(self.m_path)
+        except Exception as e:
+            logging.error(f"unable to load maps [{e}]")
+            return
+        for pth in data:
+            if not pth.endswith(".map"):
+                continue
+            pth = os.path.join(self.m_path, pth)
+            with open(pth, "rb") as file:
+                buff = file.read()
+                base = GameBaseMap()
+                if base.Initialize(buff):
+                    mapa = base.ToMap(self.Objects, self.Terrains)
+                    if not isinstance(mapa, GameMap):
+                        #! reportar error del mapa
+                        continue
+                    self.Maps.append(mapa)
+
+
+    def __dict__(self):
+        return {
+            "paths": {
+                "objects": self.o_path,
+                "terrains": self.t_path,
+                "maps": self.m_path
+            },
+            "objects": [ob.__dict__() for ob in self.Objects],
+            "terrains": [te.__dict__() for te in self.Terrains],
+            "maps": [ma.__dict__() for ma in self.Maps],
+        }

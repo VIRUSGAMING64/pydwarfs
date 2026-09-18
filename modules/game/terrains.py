@@ -1,43 +1,22 @@
+from modules.game.typesutil import *
+from modules.game.static import *
+from modules.game.initializer import *
 
-""" file.te
-terrain Grass
-char .
-resource_max 100
-regen 2
-"""
 
-class GameBaseTerrain:
+class GameTerrainBuilder:
     terrain = None
     char = None
     resource_max = None
     regen = None
 
     def Initialize(self,data):
-        data = data.decode()
-        lines = data.split('\n')
-        
-        for line in lines:
-            props = line.split(' ')
-            if len(props) != 2:
-                #* Invalid terrain file
-                return False
-            attr:str = props[0]
-            val :str  = props[1]
-            if val.isnumeric():
-                val = int(val)
-            if not hasattr(self, attr):
-                return False
-            setattr(self, attr, val)
-        return True
+        return Initialize(self, data)
     
     def ToTerrain(self) -> GameTerrain:
         return GameTerrain(self.char, self.terrain, self.resource_max, self.regen)
 
-class GameTerrain:
-    Char = ""
-    Name = ""
-    Count = 0
-    Max = 0
+class GameTerrain(GameJson):
+
     Regen = 0
     def __init__(self, char, name, cnt, reg):
         self.Char = char
@@ -47,10 +26,9 @@ class GameTerrain:
         self.Max = cnt
 
     def __dict__(self):
-        return {
-            "Name": self.Name,
-            "Char": self.Char,
-            "Count": self.Count,
-            "Max": self.Max,
-            "Regen": self.Regen
-        }
+        di:dict = super().__dict__()
+        di["Regen"] = self.Regen
+        return di
+
+    def copy(self):
+        return GameTerrain(self.Char, self.Name, self.Count, self.Regen)

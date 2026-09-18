@@ -1,0 +1,2 @@
+OBJECT = 1
+TERRAIN = 2
