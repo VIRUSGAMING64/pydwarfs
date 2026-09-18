@@ -9,6 +9,8 @@ KEYWORD = 32
 LINE = 64
 CODE = 128
 COMMENT = 256
+CONDITION = 512
+LOOP = 1024
 
 P0 = [
     "==",

@@ -1,4 +1,4 @@
-from modules.interpreter.token import Token
+from modules.interpreter.tokens.token import Token
 from modules.interpreter.statics import *
 
 def cleanStr(s: str) -> str:
@@ -106,19 +106,21 @@ class Lexer:
         li.subtokens = res
         return li
 
-    def TokenizeSource(self):
+    def TokenizeSource(self)-> list[Token]:
         lines = []
         p = 0
         for line in self.code:
             p += 1
             li = self.ProcessRawLine(line, p)
+            if li == None:
+                continue
             lines.append(li)
 
         return lines
 
     def ProcessRawLine(self, line, p):
         if line == "": 
-            return Token("", LINE, data = {"line": p})
+            return None
         
         t_line = self.str2Token(line)
         t_line.line = p

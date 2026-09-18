@@ -13,3 +13,9 @@ class MemoryException(InterpreterException):
     def __init__(self):
         super().__init__()
         self.error = "Memory exception at line [__line__]"
+
+
+class StructureException(InterpreterException):
+    def __init__(self, error):
+        super().__init__()
+        self.error = error + " [__line__]"

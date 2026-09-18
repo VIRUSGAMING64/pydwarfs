@@ -1,7 +1,7 @@
 from modules.interpreter.statics import *
 
 class Token:
-    subtokens = []
+    subtokens: list[Token] = []
     value:str = None
     type = 0
     name = None
