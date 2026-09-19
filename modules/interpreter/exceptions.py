@@ -19,3 +19,13 @@ class StructureException(InterpreterException):
     def __init__(self, error):
         super().__init__()
         self.error = error + " [__line__]"
+
+class ExpresionException(InterpreterException):
+    def __init__(self, error):
+        super().__init__()
+        self.error = error + " [__line__]"
+
+class ZeroDivisionException(InterpreterException):
+    def __init__(self, error):
+        super().__init__()
+        self.error = error + " [__line__]"

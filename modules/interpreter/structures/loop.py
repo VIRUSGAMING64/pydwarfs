@@ -2,15 +2,7 @@ from modules.interpreter.tokens.token import Token
 from modules.interpreter.statics import *
 import modules.interpreter.tokens.tokens_utils as tk_utils
 from modules.interpreter.exceptions import *
-
-
-class Structure(Token):
-    ender:Token = None
-    lines:list[Token] = None
-
-    def __init__(self, lines:Token, ender : Token):
-        self.ender = ender
-        self.lines = lines
+from modules.interpreter.structures.structure import *
 
 class Loop(Structure):
     def __init__(self, lines, ender:Token):
@@ -22,6 +14,8 @@ class Loop(Structure):
             raise Exception("Invalid loop extraction")
 
         self.base_token = base
+        self.line = base.line
+        self.expr = base.subtokens[1 : ]
         self.type = LOOP
         self.name = "__LOOP__"
         

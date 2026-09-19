@@ -6,18 +6,10 @@ def TestAstBuild():
     di = []
 
     tokens = Lexer(open("codigotest.txt","r").read(10000000), {}).TokenizeSource()
-    i = 0
-    while i < len(tokens):
-        tk = tokens[i]
-        if tk_utils.ValidLoop(tk.subtokens[0]):
-            print("here")
-            tk = Loop(tokens[i : ], Token("end")) 
-            e=tk.Exctract()
-            i += e
-        i += 1
-        di.append(tk.__dict__())  
-
-
+    ast = AstBuilder(tokens)
+    ast.ExtractLoops()
+    ast.ExtractConditions()
+    di = ast.__json__()
     s = json.dumps(di, indent="   ")
     open("ast.dat", "w").write(s)
 
@@ -29,4 +21,16 @@ def TestGameLoading():
     g.LoadMaps()
     open("gamedump.txt","w").write((json.dumps(g.__dict__(), indent="    ")))
 
+def TestExprParser():
+    tokens = Lexer(open("codigotest.txt","r").read(10000000), {}).TokenizeSource()
+    ast = AstBuilder(tokens)
+    ast.ExtractLoops()
+    ast.ExtractConditions()
+    int = Parser()
+    for line in ast.Ast:
+        res = int.EvalExpr(line.subtokens)
+        #print(res.__dict__())
+
+TestExprParser()
+TestAstBuild()
 TestGameLoading()

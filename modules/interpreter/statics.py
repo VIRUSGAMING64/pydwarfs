@@ -46,7 +46,6 @@ P3 = [
 ]
 
 operators =  [
-    "**",
     "=",
     ")",
     "(",
@@ -54,6 +53,10 @@ operators =  [
     "[",
     ",",
     "#"
+]
+
+unarysops = [
+    "!", "-", "+"
 ]
 
 operators += P0 + P1 + P2 + P3
