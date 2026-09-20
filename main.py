@@ -1,5 +1,6 @@
 from modules.game import *
 from modules.interpreter import *
+from gui.server.server import *
 import json
 
 def TestAstBuild():
@@ -31,6 +32,17 @@ def TestExprParser():
         res = int.EvalExpr(line.subtokens)
         #print(res.__dict__())
 
-TestExprParser()
+
+def TestServer():
+    path = "./gui/src"
+    ser = Server("127.0.0.1", 1200, path)
+    routes = Routes(path)
+    ser.AddEndpoint("/", routes.hola)
+    ser.AddEndpoint("/<path>", routes.getfile )
+    ser.Run()
+
+
 TestAstBuild()
 TestGameLoading()
+#TestExprParser()
+TestServer()

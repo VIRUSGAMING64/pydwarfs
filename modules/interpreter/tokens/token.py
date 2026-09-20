@@ -6,7 +6,8 @@ class Token:
     type = 0
     name = None
     line = -1
-
+    data = None
+    
     def __init__(self,expr):
         self.data = {}
         self.value = expr

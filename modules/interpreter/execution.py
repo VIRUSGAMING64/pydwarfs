@@ -50,7 +50,9 @@ class Parser:
             raise ExpresionException("Invalid expression")
         
         if len(values) == 0:
-            return Token(0, NUMBER)
+            val = Token(0)
+            val.GetType()
+            return val
         
         return values[0]
 
