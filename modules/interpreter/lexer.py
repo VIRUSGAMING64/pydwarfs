@@ -66,10 +66,6 @@ class Lexer:
                 le = len(t_token.value)
                 t_token.GetType(operators, keywords)
                 act_tok = ""
-                """
-                Is numeric & Is string van al final porque modifican el contenido de self.value 
-                Is numeric primero porque si expr == "213" ret 0 and if isstring primero expr => 213 entonces numeric retorna valor
-                """
 
             pos += 1
             
@@ -132,10 +128,6 @@ class Lexer:
                 del t_line.subtokens[j+1:]
                 break
 
-            if t_line.subtokens[j].type & KEYWORD and j != 0:
-                self.output["Errors"].append(f"keyword not in the start of line [{p}]")
-                break
-                
             t_line.subtokens[j].line = p
 
         for j in t_line.subtokens:

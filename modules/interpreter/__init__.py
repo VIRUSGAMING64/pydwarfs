@@ -4,4 +4,5 @@ from modules.interpreter.statics import *
 from modules.interpreter.tokens.token import *
 from modules.interpreter.memory import *
 from modules.interpreter.ast import *
-from modules.interpreter.execution import *
+from modules.interpreter.parser.parser import *
+from modules.interpreter.interpreter import *

@@ -1,7 +1,9 @@
 from modules.game import *
 from modules.interpreter import *
 from gui.server.server import *
+from threading import Thread
 import json
+import asyncio
 
 def TestAstBuild():
     di = []
@@ -39,10 +41,37 @@ def TestServer():
     routes = Routes(path)
     ser.AddEndpoint("/", routes.hola)
     ser.AddEndpoint("/<path>", routes.getfile )
-    ser.Run()
+    print("starting webpage...")
+    Thread(target= ser.Run,daemon=True).start()
+    print("starting websocks...")
+    wser = WebSockServer()
+    asyncio.run(wser.RunWebsocks())
+
+def TestServerCom():
+    path = "./gui/src"
+    ser = Server("127.0.0.1", 1200, path)
+    routes = Routes(path)
+    ser.AddEndpoint("/", routes.hola)
+    ser.AddEndpoint("/<path>", routes.getfile )
+    print("starting webpage...")
+    Thread(target= ser.Run,daemon=True).start()
+    print("starting websocks...")
+    g = Game()
+    g.LoadObjects()
+    g.LoadTerrains()
+    g.LoadMaps()
+    wser = WebSockServer(g)
+    asyncio.run(wser.RunWebsocks())
+
+
+def InterTest():
+    iner = Interpreter(open("codigotest.txt","r").read())
+    for i in range(10):
+        iner.Step()
 
 
 TestAstBuild()
 TestGameLoading()
 #TestExprParser()
-TestServer()
+#TestServerCom()
+InterTest()

@@ -42,8 +42,9 @@ let ctx = canvas.getContext("2d");
 console.log("ready");
 let com = new Communication("ws://127.0.0.1:9090");
 setInterval(() => {
+    console.log(com.Send("SHOW"));
     console.log(com.Recive());
-}, 1000 / 30);
+}, 1000 / 1);
 if (ctx) {
     let conf = new Drawler(ctx, pixsz, mapsize);
     conf.FillMatrix();
