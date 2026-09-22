@@ -15,9 +15,7 @@ class Interpreter:
         lexed = Lexer(rawSrc, errors)
         logging.debug(errors["Errors"])
         self.ast = AstBuilder(lexed.TokenizeSource())
-        self.ast.ExtractConditions()
-        self.ast.ExtractLoops()
-
+        self.ast.ExtractStructures()
 
     def Step(self):
         if self.line >= len(self.ast.Ast):

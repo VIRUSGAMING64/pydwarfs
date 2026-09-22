@@ -1,6 +1,16 @@
 from modules.interpreter.structures import *
 
 
+def ToksCompression(tokens: list[Token]):
+    s = ""
+    for i in tokens:
+        s += i.name + " "
+    s=s.removesuffix(" ")
+    tok = Token(s)
+    tok.line = LINE
+    tok.subtokens = [tk.copy() for tk in tokens]
+    return tok
+
 class AstBuilder:
     Ast:list[Token|Loop|Condition] = None
 
@@ -10,29 +20,51 @@ class AstBuilder:
     def __json__(self):
         return [t.__dict__() for t in self.Ast]
 
-    def ExtractLoops(self):
-        i = 0
-        Ast = []
-        while i < len(self.Ast):
-            loop = self.Ast[i]
-            if tk_utils.ValidLoop(loop.subtokens[0]):
-                loop = Loop(self.Ast[i : ], Token("end")) 
-                e=loop.Exctract()
-                i += e
-            i += 1
-            Ast.append(loop)
-        self.Ast = Ast
+    def ExtractStructures(self, start=0, toks =None):
 
-    def ExtractConditions(self):
-        i = 0
+        i = start
         Ast = []
-        while i < len(self.Ast):
-            cond = self.Ast[i]
-            if tk_utils.ValidCondition(cond.subtokens[0]):
-                print("here")
-                cond = Condition(self.Ast[i : ], Token("end")) 
-                e=cond.Exctract()
-                i += e
-            i += 1
-            Ast.append(cond)
-        self.Ast = Ast
+        if toks == None:
+            toks = self.Ast
+
+        while i < len(toks):
+            subtok = toks[i]
+            if tk_utils.ValidLoop(subtok):
+                end , structures = self.ExtractStructures(i + 1, toks)
+                lo = Loop([toks[i]]  + structures)
+                Ast.append(lo)
+                i = end
+            elif tk_utils.ValidCondition(subtok):
+                end , structures = self.ExtractStructures(i + 1, toks)
+                cond = Condition([toks[i]]  + structures)
+                Ast.append(cond)
+                i = end
+            elif tk_utils.ValidGotoCondition(subtok):                  
+                for j,elem in enumerate(toks[i].subtokens):
+                    print(elem.name)
+                    if elem.name == "goto":
+                        subtokens = toks[i].subtokens[j : ]
+                        expr = toks[i].subtokens[0:j]
+                        cond = Condition([
+                            ToksCompression(expr),
+                            ToksCompression(subtokens)
+                        ])     
+                        Ast.append(cond)
+                        i += 1
+                        break
+                continue
+                    
+            elif toks[i].value == "end":
+                if start == 0:
+                    self.Ast = Ast
+                    return
+                return i, Ast
+            else:
+                i += 1
+                Ast.append(subtok)
+
+        if start == 0:
+            self.Ast = Ast
+            return
+        
+        raise Exception("Not closed strucure")

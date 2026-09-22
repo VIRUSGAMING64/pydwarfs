@@ -17,7 +17,20 @@ class Token:
         self.name = expr
         self.subtokens = []
 
+    def copy(self):
+        new = Token(
+            self.name
+        )
+        new.subtokens = [sub.copy() for sub in self.subtokens]
+        new.value = self.value
+        new.line = self.line
+        new.type = self.type
+        new.data = self.data.copy()
+        return new
+
     def __dict__(self):
+        if self.subtokens == None:
+            self.subtokens = []
         return {
             "name": self.name,
             "type": self.type,
