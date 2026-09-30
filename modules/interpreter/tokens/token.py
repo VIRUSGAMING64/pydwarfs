@@ -1,3 +1,4 @@
+from modules.interpreter.parser.parserutils import process_op
 from modules.interpreter.statics import *
 from modules.interpreter.memory import *
 from modules.interpreter.exceptions import *
@@ -39,9 +40,6 @@ class Token:
             "data": self.data,
             "subtokens": [token.__dict__() for token in self.subtokens]
         }
-
-    def Execute(self, parser: Parser):
-        parser.EvalExpr(self.subtokens)
 
     def VarName(self):
         if self.type != NIL:
@@ -123,10 +121,18 @@ class Token:
 
 
 class Parser:
-    def __init__(self):
-        pass
+    memory: Memory = None
+    def __init__(self,mem: Memory):
+        self.memory = mem
 
     def EvalExpr(self, toks:list[Token]):
+
+        #! debug
+        print("__________DEBUG__________")
+        for i in toks:
+            print(i.name,end = " ")
+        print("\n__________DEBUG__________")
+        #!
         operations = []
         values = []
         unary = True
@@ -135,11 +141,12 @@ class Parser:
                 continue
 
             if elem.type & VARIABLE:
-                print(elem.__dict__())
-                continue
-                #data = self.memory.query(elem.name)
+                value = self.memory.query(elem.name)
+                if value == None and (lineidx != 0 or toks[lineidx + 1].value != "="):
+                    raise Exception("Variable not declared")
+                elem.value = value
                 
-            elif elem.name == "(":
+            if elem.name == "(":
                 operations.append(elem)
                 unary = True
         
@@ -167,8 +174,9 @@ class Parser:
             else:
                 unary = False
                 values.append(elem)
-        
-        while len(operations):
+
+   
+        while len(operations) > 0:
             self.process(values,operations, -1)
 
         if len(values) > 1 or len(operations)!=0:
@@ -183,6 +191,13 @@ class Parser:
 
     def process(self, nums, oper , li = None):
         try:
+            
+            for i in nums:
+                print("num: ",i.__dict__())
+                
+            for i in oper:
+                print("oper: ",i.__dict__())
+
             a = nums.pop()
             opp = oper.pop()
             if opp.data.get("neg", False):
@@ -191,11 +206,13 @@ class Parser:
                 res.GetType(operators,keywords)
                 nums.append(res)
                 return
+    
             b = nums.pop()        
-            n = process_op(a, b, opp, None)
+            n = process_op(a, b, opp, self.memory)
             if n == None:
                 #* se esta haciendo una asignacion de valor 
                 nums.append(b)
+                print(b.__dict__())
                 return
             res = Token(n)
             res.GetType(operators, keywords)

@@ -12,8 +12,11 @@ class Memory:
         self.addrs[addr] = [None] * size
         return addr
 
-    def SingleAlloc(self):
-        pass
+    def alloc(self, key, value):
+        self.addrs[key] = value
+
+    def query(self, key):
+        return self.addrs.get(key, None)
 
     def realloc(self, addr, size):
         if self.addrs.get(addr) == None:

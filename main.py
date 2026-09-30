@@ -13,7 +13,7 @@ def TestAstBuild():
     ast.ExtractStructures()
     di = ast.__json__()
     s = json.dumps(di, indent="   ")
-    open("ast.dat", "w").write(s)
+    open("ast.json", "w").write(s)
 
 
 def TestGameLoading():
@@ -68,9 +68,10 @@ def InterTest():
     for i in range(10):
         iner.Step()
 
+    print(iner.memory.addrs)
 
 TestAstBuild()
 TestGameLoading()
 #TestExprParser()
 #TestServerCom()
-#InterTest()
+InterTest()

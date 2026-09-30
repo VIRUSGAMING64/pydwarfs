@@ -1,17 +1,14 @@
 
-from modules.interpreter.tokens.tokens_utils import *
+from modules.interpreter.statics import *
 
-def IsOperator(tk : Token):
-    return True if tk.name in operators else False    
-
-def is_unary(tk : Token):
-    return True if tk.name in unarysops else False
-
+from modules.interpreter.tokens.tokens_utils import IsOperator, is_unary
+from modules.interpreter.tokens.token import *
+from modules.interpreter.memory import *
 
 def getPrio(value):
     if value.data.get("neg", False):
         return 3
-    op = value.value
+    op = value.name
     if op in P0:
         return 0
     if op in P1:
@@ -22,8 +19,10 @@ def getPrio(value):
         return 3
     return -1
 
-def asign(a, b, mem):
-   pass #TODO
+def asign(a:"Token", b:"Token", mem: Memory):
+    a.value = b.value
+    mem.alloc(a.name, a.value)
+   
     
 def UnaryOP(a,op):
     return una[op.value](a)

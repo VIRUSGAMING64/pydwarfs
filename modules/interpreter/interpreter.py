@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.DEBUG)
 class Interpreter:
     ast:AstBuilder = None
     line:int = 0
+    memory: Memory = None
 
     def __init__(self, rawSrc):
         errors = {}
@@ -16,12 +17,16 @@ class Interpreter:
         logging.debug(errors["Errors"])
         self.ast = AstBuilder(lexed.TokenizeSource())
         self.ast.ExtractStructures()
+        self.memory = Memory()
+
 
     def Step(self):
         if self.line >= len(self.ast.Ast):
             return False
 
-        parser = Parser()
-        self.ast.Ast[self.line].Execute(parser)
+        parser = Parser(self.memory)
+        ip = self.ast.Ast[self.line]
+        print("Executed: ",self.line, type(ip))
+        code, out = ip.Execute(parser)
         print("line: ", self.line, "evaluated")
         self.line+=1

@@ -16,6 +16,7 @@ class AstBuilder:
 
     def __init__(self, code: list[Token]):
         self.Ast = code
+        self.labels = {}
 
     def __json__(self):
         return [t.__dict__() for t in self.Ast]
@@ -60,8 +61,8 @@ class AstBuilder:
                     return
                 return i, Ast
             else:
+                Ast.append(SingleLine([toks[i]]  + toks[i].subtokens))
                 i += 1
-                Ast.append(subtok)
 
         if start == 0:
             self.Ast = Ast

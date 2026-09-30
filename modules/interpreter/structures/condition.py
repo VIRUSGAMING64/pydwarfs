@@ -23,7 +23,8 @@ class Condition(Structure):
         return False
 
     def Execute(self, parser: Parser):
-        pass
+        return None,None
+        
     
     def EvalCond():
         pass

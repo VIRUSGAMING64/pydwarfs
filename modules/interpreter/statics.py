@@ -12,6 +12,7 @@ COMMENT = 256
 CONDITION = 512
 LOOP = 1024
 LABEL = 2048
+GOTO = 4096
 
 P0 = [
     "==",

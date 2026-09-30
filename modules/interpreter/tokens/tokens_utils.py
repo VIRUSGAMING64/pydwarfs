@@ -1,4 +1,17 @@
-from modules.interpreter.tokens.token import *
+from typing import TYPE_CHECKING
+
+from modules.interpreter.statics import *
+
+if TYPE_CHECKING:
+    from modules.interpreter.tokens.token import Token
+
+
+def IsOperator(tk: "Token"):
+    return tk.name in operators
+
+
+def is_unary(tk: "Token"):
+    return tk.name in unarysops
 
 def ValidLoop(line: Token):
     if line.subtokens[0].name != "while":
