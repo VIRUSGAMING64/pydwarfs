@@ -4,12 +4,10 @@ from modules.interpreter.tokens.token import *
 
 
 #* Exit codes from intructions
-NORMAL = 0
+NORMAL = 1
 FINDING = 2
 RETURING = 4
-
-
-
+CONTINUE = 8
 
 class Structure(Token):
     expr:list[Token] =  None

@@ -1,5 +1,6 @@
 from modules.interpreter.tokens.token import Token
 from modules.interpreter.statics import *
+from modules.interpreter.exceptions import *
 
 def cleanStr(s: str) -> str:
     while s.startswith(" "):
@@ -26,7 +27,7 @@ class Lexer:
         start_str = None
         in_str = False
         while pos <= len(expr):
-            if (pos < len(expr)) and ((not expr[pos] in operators) or in_str):
+            if ((pos < len(expr)) and ((not expr[pos] in operators)) or in_str):
                 act_tok += expr[pos]
 
                 if start_str == None and expr[pos] in ["\"", "\'"]:
@@ -65,6 +66,7 @@ class Lexer:
                 t_token:Token = tokens[len(tokens) + dis]
                 le = len(t_token.value)
                 t_token.GetType(operators, keywords)
+
                 act_tok = ""
 
             pos += 1
@@ -81,13 +83,19 @@ class Lexer:
                     line_tokens.append(t[0])        
             else:
                 line_tokens.append(line)      
+        for t in line_tokens:
+            if t.type == NIL:
+                
+                raise SintaxisException(f"Sintax error with token [{t.value}]")           
 
         return line_tokens
         
     def getErrs(self,  expr):
         expr = expr.split(' ')
         if len(expr) == 1:
-            return [[Token(expr[0])]]
+            tk = Token(expr[0])
+            tk.GetType(operators, keywords)
+            return [[tk]]
         arr = []
         for x in expr:
             arr.append(self.Tokenize(x))
@@ -111,10 +119,10 @@ class Lexer:
             if li == None:
                 continue
             lines.append(li)
-
         return lines
 
-    def ProcessRawLine(self, line, p):
+    def ProcessRawLine(self, line: str, p):
+        line = line.strip()
         if line == "": 
             return None
         

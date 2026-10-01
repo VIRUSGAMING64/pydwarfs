@@ -7,7 +7,6 @@ import asyncio
 
 def TestAstBuild():
     di = []
-
     tokens = Lexer(open("codigotest.txt","r").read(10000000), {}).TokenizeSource()
     ast = AstBuilder(tokens)
     ast.ExtractStructures()
@@ -65,13 +64,20 @@ def TestServerCom():
 
 def InterTest():
     iner = Interpreter(open("codigotest.txt","r").read())
-    for i in range(10):
-        iner.Step()
+    p = iner.Step()
+    c = 2000
+    while p:
+        p = iner.Step()
+        if c == 0:
+            print(iner.memory.addrs)
+            raise "Code permanent"
+
+        c-=1
 
     print(iner.memory.addrs)
 
 TestAstBuild()
 TestGameLoading()
 #TestExprParser()
-#TestServerCom()
-InterTest()
+TestServerCom()
+#InterTest()

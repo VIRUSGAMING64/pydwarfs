@@ -3,6 +3,7 @@ from modules.interpreter.statics import *
 from modules.interpreter.memory import *
 from modules.interpreter.exceptions import *
 from modules.interpreter.parser.parserutils import *
+from typing import TYPE_CHECKING
 
 class Token:
     subtokens: list[Token] = None
@@ -11,7 +12,10 @@ class Token:
     name = None
     line = -1
     data = None
-    
+
+    def Execute(self,parser):
+        raise "Token not executable"
+        
     def __init__(self,expr):
         self.data = {}
         self.value = expr
@@ -90,13 +94,24 @@ class Token:
         if self.type != NIL:
             return NIL
         if not isinstance(self.value, str):
-            return NIL
-        return STRING
+            return NIL 
+        flag = False
+        for c in ["'", '"']:
+            if self.value.startswith(c):
+                flag = True
+
+        if flag:
+            self.type = STRING
+
+        return self.type
 
     def isLabel(self):
         if self.type != NIL:
             return NIL
         self.type = LABEL if self.value.endswith(":") else NIL
+        if self.type & LABEL:
+            self.name = self.name.removesuffix(":")
+           
         return self.type
     
     def IsNum(self):
@@ -143,7 +158,7 @@ class Parser:
             if elem.type & VARIABLE:
                 value = self.memory.query(elem.name)
                 if value == None and (lineidx != 0 or toks[lineidx + 1].value != "="):
-                    raise Exception("Variable not declared")
+                    raise MissingVariable(elem.name)
                 elem.value = value
                 
             if elem.name == "(":

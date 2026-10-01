@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <style>
-        *{
-            padding: 0;
-            margin: 0;
-            user-select: none;
-            position: absolute;
-            left: 0px;
-            top: 0px;
-        }
-    </style>
+   <script src="tailwind.js"></script>
+
     <title>pydwarf</title>
 </head>
-<body>
+<body class="bg-red-950">
     <script type="module" src="/main.js"></script>
-    <canvas id="drawler"></canvas>
-</body>
+    <div class="animate flex">
+        <div class="">
+            <button class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">Agregar</button>
+            <button class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">Agregar</button>
+            <button class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">Agregar</button>
+            <button class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">Agregar</button>
+        </div>
+        <div id="draw"></div>
+    </div>
+    </body>
 </html>

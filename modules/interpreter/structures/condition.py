@@ -13,6 +13,14 @@ class Condition(Structure):
         self.type = CONDITION
         self.name = "__CONDITION__"
         self.expr = base.subtokens[1 : ]
+        self.ip = 0
+
+    def __dict__(self):
+        di = super().__dict__()
+        del di["value"]
+        del di["data"]
+        return di
+
 
     def IsGoto(self):
         for i,elem in enumerate(self.base_token.subtokens):
@@ -22,9 +30,23 @@ class Condition(Structure):
                 return True
         return False
 
-    def Execute(self, parser: Parser):
-        return None,None
-        
-    
-    def EvalCond():
-        pass
+    def Execute(self, parser: Parser):  
+        if self.ip == 0:
+            if not self.EvalCond(parser):
+                return NORMAL,None
+        l=self.ip
+        self.ip = 0
+        expr=self.subtokens[l]
+        code, val = expr.Execute(parser)        
+        if code != NORMAL:
+            return code,val
+        self.ip = l + 1
+        if self.ip == len(self.subtokens):    
+            return NORMAL, None
+        else:
+            return CONTINUE, None
+
+    def EvalCond(self,parser: Parser):
+        tok = parser.EvalExpr(self.expr)
+        print("CONDITION STATUS: ", tok.value)
+        return tok.value

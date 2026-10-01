@@ -69,8 +69,7 @@ keywords = [
     "func",
     "var",
     "for",
-    "end",
-    "creature",
+    "end"
 
 ]
 

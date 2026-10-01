@@ -5,7 +5,6 @@ from modules.interpreter.statics import *
 if TYPE_CHECKING:
     from modules.interpreter.tokens.token import Token
 
-
 def IsOperator(tk: "Token"):
     return tk.name in operators
 
@@ -18,6 +17,14 @@ def ValidLoop(line: Token):
         return False
 
     return True
+
+def validGoto(line):
+    if line.type & LINE == 0:
+        return False
+    if len(line.subtokens) != 2:
+        return False
+
+    return line.subtokens[0].value == "goto"
 
 def ValidCondition(line : Token):
     if line.subtokens[0].name != "if":

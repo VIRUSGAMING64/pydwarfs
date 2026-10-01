@@ -15,6 +15,12 @@ class MemoryException(InterpreterException):
         self.error = "Memory exception at line [__line__]"
 
 
+class MissingVariable(InterpreterException):
+    def __init__(self,var):
+        super().__init__()
+        self.error = f"Variable not declared [{var}] at line [__line__]"
+
+
 class StructureException(InterpreterException):
     def __init__(self, error):
         super().__init__()
@@ -26,6 +32,11 @@ class ExpresionException(InterpreterException):
         self.error = error + " [__line__]"
 
 class ZeroDivisionException(InterpreterException):
+    def __init__(self, error):
+        super().__init__()
+        self.error = error + " [__line__]"
+
+class SintaxisException(InterpreterException):
     def __init__(self, error):
         super().__init__()
         self.error = error + " [__line__]"

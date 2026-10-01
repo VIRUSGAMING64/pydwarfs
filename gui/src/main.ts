@@ -31,40 +31,42 @@ class Drawler{
         this.ctx.strokeRect(px,py, this.pix, this.pix)
     }
 
-    GetPos(x :number,y :number) {
+    GetPos(x :number,y :number, color = "black", border = "red") {
         let px = Math.floor(x / this.pix) 
         let py = Math.floor(y / this.pix)
-        this.Fill(px,py)
+        this.Fill(px,py,color, border)
     }
 
 }
 
-let mapsize = 30
-let pixsz = Math.max(window.innerWidth, window.innerHeight)  / mapsize
-let canvas = document.createElement("canvas")
-canvas.width =  Math.max(window.innerWidth, window.innerHeight)
-canvas.height =  Math.max(window.innerWidth, window.innerHeight)
-document.body.appendChild(canvas)
-let ctx = canvas.getContext("2d")
-console.log("ready")
-let com = new Communication("ws://127.0.0.1:9090")
-
-
-setInterval(()=>{
-    console.log(com.Send("SHOW"))
-    console.log(com.Recive())
-}, 1000 / 1)
-
-if (ctx){
-    let conf = new Drawler(ctx, pixsz, mapsize)
-    conf.FillMatrix()
-    window.addEventListener("mousedown", (ev)=>{
-        let x = ev.pageX
-        let y = ev.pageY
-        conf.GetPos(x,y)
-    })
-}else{
-    alert("El context es null !!!")
+let mapsize = 30;
+let pixsz = Math.max(window.innerWidth, window.innerHeight) / mapsize;
+let canvas = document.createElement("canvas");
+let elem = document.getElementById("draw")
+if (elem != null){
+    elem.appendChild(canvas);
 }
+canvas.width = Math.max(window.innerWidth, window.innerHeight);
+canvas.height = Math.max(window.innerWidth, window.innerHeight);
 
+let ctx = canvas.getContext("2d");
+console.log("ready");
+let com = new Communication("ws://127.0.0.1:9090");
+setInterval(() => {
+    console.log(com.Send("SHOW"));
+    console.log(com.Recive());
+}, 1000 / 1);
+if (ctx) {
+    let conf = new Drawler(ctx, pixsz, mapsize);
+    conf.FillMatrix();
+    canvas.addEventListener("mousedown", (ev) => {
+        let x = ev.offsetX;
+        let y = ev.offsetY;
+        console.log(x,y)
+        conf.GetPos(x, y,"blue");
+    });
+}
+else {
+    alert("El context es null !!!");
+}
 

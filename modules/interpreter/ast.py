@@ -35,21 +35,27 @@ class AstBuilder:
                 lo = Loop([toks[i]]  + structures)
                 Ast.append(lo)
                 i = end
+
             elif tk_utils.ValidCondition(subtok):
                 end , structures = self.ExtractStructures(i + 1, toks)
                 cond = Condition([toks[i]]  + structures)
                 Ast.append(cond)
                 i = end
+
             elif tk_utils.ValidGotoCondition(subtok):                  
                 for j,elem in enumerate(toks[i].subtokens):
                     print(elem.name)
                     if elem.name == "goto":
-                        subtokens = toks[i].subtokens[j : ]
                         expr = toks[i].subtokens[0:j]
+                        subtokens = toks[i].subtokens[j : ]
                         cond = Condition([
                             ToksCompression(expr),
                             ToksCompression(subtokens)
                         ])     
+                        lie = SingleLine([cond.subtokens[0]] + cond.subtokens[0].subtokens)
+                        if tk_utils.validGoto(lie):
+                            lie = Goto(lie.subtokens[1])
+                        cond.subtokens[0] = lie
                         Ast.append(cond)
                         i += 1
                         break
@@ -61,7 +67,12 @@ class AstBuilder:
                     return
                 return i, Ast
             else:
-                Ast.append(SingleLine([toks[i]]  + toks[i].subtokens))
+                lie = SingleLine([toks[i]]  + toks[i].subtokens)
+                if tk_utils.validGoto(lie):
+                    lie = Goto(lie.subtokens[1])
+                Ast.append(
+                    lie
+                )
                 i += 1
 
         if start == 0:
