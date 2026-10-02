@@ -5,6 +5,7 @@ class Goto(Structure):
     def __init__(self, label):
         super().__init__([])
         self.type = GOTO
+        self.line = label.line
         self.name = "__GOTO__"
         self.label = label.name
 

@@ -14,7 +14,11 @@ class Interpreter:
     line:int = 0
     memory: Memory = None
 
-    def __init__(self, rawSrc):
+    def __init__(self, rawSrc="", filename = "__file__"):
+        if rawSrc == "":
+            with open(filename,"rb") as f:
+                rawSrc = f.read()
+
         errors = {}
         attrs = [
             "creature", 
@@ -32,15 +36,29 @@ class Interpreter:
         if idx == -1:
             raise Exception("Entry point unknow")
 
+
+        #* Initializing attrubutes
+        for attr in attrs:
+            self.__setattr__(attr, None)
+
+        #* En el pdf se dice q todo lo que esta antes de start:
+        #* es un header por tanto no debe haber labels antes de start
+        #* de todas formas start se busca usualmente
+
         for i in range(idx):
             li = self.ast.Ast[i]
             if len(li.subtokens) != 2:
-                raise Exception("Invalid header")        
+                raise Exception(f"Invalid header at line [{li.line}]")        
             head = li.subtokens[0].name
             val = li.subtokens[1].value
             if not (head in attrs):
                 raise Exception("Invalid header")        
             self.__setattr__(head, val)
+
+        #* Checking creatures attributes
+        for attr in attrs:
+            if self.__getattribute__(attr)==None:
+                raise Exception(f"Creature with missing attribute [{attr}] error at file: [{filename}]")
 
         self.line = idx
 #        print("iniciacion:",self.creature)
@@ -50,7 +68,7 @@ class Interpreter:
             if elem.type&LABEL:
                 if elem.type == LABEL and elem.name == label:
                     return i
-            else:
+            elif label != "start": #* Aqui se evita que start: este dentro de algo
                 pos = self.FindLabel(label, elem.subtokens)
                 if pos != -1:
                     elem.ip = pos

@@ -5,6 +5,7 @@ class Label(Structure):
     def __init__(self, label):
         super().__init__([])
         self.type = LABEL
+        self.line = label.line
         self.name = label.name.removesuffix(":")
 
     def __dict__(self):

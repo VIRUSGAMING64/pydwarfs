@@ -33,20 +33,8 @@ def TestExprParser():
         #print(res.__dict__())
 
 
-def TestServer():
-    path = "./gui/src"
-    ser = Server("127.0.0.1", 1200, path)
-    routes = Routes(path)
-    ser.AddEndpoint("/", routes.hola)
-    ser.AddEndpoint("/<path>", routes.getfile )
-    print("starting webpage...")
-    Thread(target= ser.Run,daemon=True).start()
-    print("starting websocks...")
-    wser = WebSockServer()
-    asyncio.run(wser.RunWebsocks())
-
 def TestServerCom():
-    path = "./gui/src"
+    path = "./src"
     ser = Server("127.0.0.1", 1200, path)
     routes = Routes(path)
     ser.AddEndpoint("/", routes.hola)
@@ -76,8 +64,8 @@ def InterTest():
 
     print(iner.memory.addrs)
 
-TestAstBuild()
-TestGameLoading()
+#TestAstBuild()
+#TestGameLoading()
 #TestExprParser()
-#TestServerCom()
-InterTest()
+TestServerCom()
+#InterTest()

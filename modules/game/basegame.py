@@ -15,9 +15,10 @@ class Game:
     m_path = DEFAULT_M_PATH
     t_path = DEFAULT_T_PATH
     o_path = DEFAULT_O_PATH
-    Terrains:list[GameTerrain] = []
-    Objects:list[GameObject] = []
-    Maps:list[GameMap] = []
+    Terrains:list[GameTerrain] = None
+    Objects:list[GameObject] = None
+    Maps:list[GameMap] = None
+    
     def __init__(self, m_path = DEFAULT_M_PATH, t_path = DEFAULT_T_PATH, o_path = DEFAULT_O_PATH):
         os.makedirs(m_path, exist_ok=True)
         os.makedirs(t_path, exist_ok=True)
@@ -25,6 +26,9 @@ class Game:
         self.o_path = o_path
         self.t_path = t_path
         self.m_path = m_path
+        self.Objects = []
+        self.Terrains = []
+        self.Maps = []
 
     def LoadTerrains(self):
         try:

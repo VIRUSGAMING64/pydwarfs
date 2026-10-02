@@ -4,12 +4,13 @@ import os
 import json
 from gui.server.routes import *
 import time
+from modules.game import *
 
 
 class WebSockServer:
     websock = None 
     game = None
-    def __init__(self, game):
+    def __init__(self, game: Game):
         self.game = game
 
     async def RunWebsocks(self):
