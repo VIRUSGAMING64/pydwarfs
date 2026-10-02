@@ -72,12 +72,12 @@ def InterTest():
             print(iner.memory.addrs)
             raise "Code permanent"
 
-        c-=1
+        c+=1
 
     print(iner.memory.addrs)
 
 TestAstBuild()
 TestGameLoading()
 #TestExprParser()
-TestServerCom()
-#InterTest()
+#TestServerCom()
+InterTest()

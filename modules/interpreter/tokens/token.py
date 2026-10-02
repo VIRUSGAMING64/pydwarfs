@@ -142,12 +142,6 @@ class Parser:
 
     def EvalExpr(self, toks:list[Token]):
 
-        #! debug
-        print("__________DEBUG__________")
-        for i in toks:
-            print(i.name,end = " ")
-        print("\n__________DEBUG__________")
-        #!
         operations = []
         values = []
         unary = True
@@ -206,13 +200,6 @@ class Parser:
 
     def process(self, nums, oper , li = None):
         try:
-            
-            for i in nums:
-                print("num: ",i.__dict__())
-                
-            for i in oper:
-                print("oper: ",i.__dict__())
-
             a = nums.pop()
             opp = oper.pop()
             if opp.data.get("neg", False):
@@ -227,7 +214,6 @@ class Parser:
             if n == None:
                 #* se esta haciendo una asignacion de valor 
                 nums.append(b)
-                print(b.__dict__())
                 return
             res = Token(n)
             res.GetType(operators, keywords)

@@ -48,5 +48,4 @@ class Condition(Structure):
 
     def EvalCond(self,parser: Parser):
         tok = parser.EvalExpr(self.expr)
-        print("CONDITION STATUS: ", tok.value)
         return tok.value

@@ -13,9 +13,21 @@ class Loop(Structure):
         self.type = LOOP
         self.name = "__LOOP__"
         self.expr = base.subtokens[1 : ]
+        self.ip = 0
 
-    def Execute():
-        pass
+    def Execute(self, parser: Parser):  
+            if self.ip == 0:
+                if not self.EvalCond(parser):
+                    return NORMAL,None
+            l=self.ip
+            self.ip = 0
+            expr=self.subtokens[l]
+            code, val = expr.Execute(parser)        
+            if code != NORMAL:
+                return code,val
+            self.ip = (l + 1) % len(self.subtokens)
+            return CONTINUE, None
 
-    def EvalCond():
-        pass
+    def EvalCond(self,parser: Parser):
+        tok = parser.EvalExpr(self.expr)
+        return tok.value

@@ -25,7 +25,6 @@ class SingleLine(Structure):
 
     def Execute(self, parser: Parser):
         val = parser.EvalExpr(self.subtokens)
-        print(val.__dict__())
         return NORMAL, None
     
     def __dict__(self):

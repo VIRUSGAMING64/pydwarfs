@@ -18,6 +18,13 @@ def ValidLoop(line: Token):
 
     return True
 
+def ValidLabel(line: Token):
+    if (line.subtokens[0].type & LABEL) == 0:
+        return False
+    if len(line.subtokens) != 1:
+        return False
+    return True
+
 def validGoto(line):
     if line.type & LINE == 0:
         return False
