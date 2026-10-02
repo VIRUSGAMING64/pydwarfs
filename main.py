@@ -20,7 +20,10 @@ def TestGameLoading():
     g.LoadTerrains()
     g.LoadObjects()
     g.LoadMaps()
+    g.LoadCreatures()
+        
     open("gamedump.txt","w").write((json.dumps(g.__dict__(), indent="    ")))
+
 
 def TestExprParser():
     tokens = Lexer(open("codigotest.txt","r").read(10000000), {}).TokenizeSource()
@@ -31,7 +34,6 @@ def TestExprParser():
     for line in ast.Ast:
         res = int.EvalExpr(line.subtokens)
         #print(res.__dict__())
-
 
 def TestServerCom():
     path = "./src"
@@ -46,6 +48,9 @@ def TestServerCom():
     g.LoadObjects()
     g.LoadTerrains()
     g.LoadMaps()
+    g.LoadCreatures()
+    for i in range(200):
+        g.Step()
     wser = WebSockServer(g)
     asyncio.run(wser.RunWebsocks())
 
@@ -64,8 +69,8 @@ def InterTest():
 
     print(iner.memory.addrs)
 
-#TestAstBuild()
-#TestGameLoading()
+TestAstBuild()
+TestGameLoading()
 #TestExprParser()
+InterTest()
 TestServerCom()
-#InterTest()

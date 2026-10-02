@@ -14,6 +14,13 @@ class Interpreter:
     line:int = 0
     memory: Memory = None
 
+    def __dict__(self):
+        di = {
+            "memory": self.memory.__dict__(),
+            "line": self.line
+        }
+        return di
+
     def __init__(self, rawSrc="", filename = "__file__"):
         if rawSrc == "":
             with open(filename,"rb") as f:
@@ -53,15 +60,24 @@ class Interpreter:
             val = li.subtokens[1].value
             if not (head in attrs):
                 raise Exception("Invalid header")        
-            self.__setattr__(head, val)
+            self.__setattr__(head, val)                
+            self.memory.alloc(head, val)
 
         #* Checking creatures attributes
         for attr in attrs:
             if self.__getattribute__(attr)==None:
                 raise Exception(f"Creature with missing attribute [{attr}] error at file: [{filename}]")
 
+        self.alloc("x", 0)
+        self.alloc("y", 0)
+
         self.line = idx
 #        print("iniciacion:",self.creature)
+    def query(self, attr):
+        return self.memory.query(attr)
+
+    def alloc(self, attr, val):
+        self.memory.alloc(attr,val)
 
     def FindLabel(self, label, lines)-> int:
         for i, elem in enumerate(lines):
