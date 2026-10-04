@@ -19,15 +19,12 @@ class Loop(Structure):
             if self.ip == 0:
                 if not self.EvalCond(parser):
                     return NORMAL,None
-            l=self.ip
-            self.ip = 0
-            expr=self.subtokens[l]
+            expr=self.subtokens[self.ip]
             code, val = expr.Execute(parser)        
             if code != NORMAL:
                 return code,val
-            self.ip = (l + 1) % len(self.subtokens)
+            self.ip = (self.ip + 1) % len(self.subtokens)
             return CONTINUE, None
 
     def EvalCond(self,parser: Parser):
-        tok = parser.EvalExpr(self.expr)
-        return tok.value
+        return parser.EvalExpr(self.expr).value

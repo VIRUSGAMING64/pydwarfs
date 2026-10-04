@@ -72,7 +72,8 @@ class Interpreter:
         self.alloc("y", 0)
 
         self.line = idx
-#        print("iniciacion:",self.creature)
+        self.parser = Parser(self.memory)
+                
     def query(self, attr):
         return self.memory.query(attr)
 
@@ -95,10 +96,9 @@ class Interpreter:
         if self.line >= len(self.ast.Ast):
             return False
 
-        parser = Parser(self.memory)
         ip = self.ast.Ast[self.line]
-        code, out = ip.Execute(parser)
-        if code == FINDING:
+        code, out = ip.Execute(self.parser)
+        if code & FINDING:
             p = self.FindLabel(out,self.ast.Ast)
             self.line = p
             if p == -1:

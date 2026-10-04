@@ -57,20 +57,13 @@ def TestServerCom():
 
 def InterTest():
     iner = Interpreter(open("codigotest.txt","r").read())
-    p = iner.Step()
-    c = 2000
-    while p:
-        p = iner.Step()
-        if c == 0:
-            print(iner.memory.addrs)
-            raise "Code permanent"
-
-        c+=1
+    while iner.Step():
+        pass
 
     print(iner.memory.addrs)
 
-TestAstBuild()
-TestGameLoading()
+#TestAstBuild()
+#TestGameLoading()
 #TestExprParser()
 InterTest()
-TestServerCom()
+#TestServerCom()

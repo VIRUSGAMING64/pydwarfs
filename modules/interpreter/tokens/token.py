@@ -146,16 +146,17 @@ class Parser:
         operations = []
         values = []
         unary = True
-        for lineidx, elem in enumerate(toks):
-            if elem.type & COMMENT:
-                continue
 
+
+        for lineidx, elem in enumerate(toks):
             if elem.type & VARIABLE:
                 value = self.memory.query(elem.name)
                 if value == None and (lineidx != 0 or toks[lineidx + 1].value != "="):
                     raise MissingVariable(elem.name)
                 elem.value = value
-                
+
+
+        for lineidx, elem in enumerate(toks):       
             if elem.name == "(":
                 operations.append(elem)
                 unary = True
@@ -187,7 +188,7 @@ class Parser:
 
    
         while len(operations) > 0:
-            self.process(values,operations, -1)
+            self.process(values,operations)
 
         if len(values) > 1 or len(operations)!=0:
             raise ExpresionException("Invalid expression")
@@ -199,13 +200,12 @@ class Parser:
         
         return values[0]
 
-    def process(self, nums, oper , li = None):
+    def process(self, nums, oper):
         try:
             a = nums.pop()
             opp = oper.pop()
             if opp.data.get("neg", False):
-                res = UnaryOP(a,  opp)
-                res = Token( res)
+                res =  Token( UnaryOP(a,  opp) )
                 res.GetType(operators,keywords)
                 nums.append(res)
                 return
@@ -216,6 +216,7 @@ class Parser:
                 #* se esta haciendo una asignacion de valor 
                 nums.append(b)
                 return
+            
             res = Token(n)
             res.GetType(operators, keywords)
             nums.append(res)
