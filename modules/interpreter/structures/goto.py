@@ -14,6 +14,7 @@ class Goto(Structure):
         di["label"] = self.label
         del di["value"]
         del di["data"]
+        del di["expr"]
         return di
 
     def Execute(self, parser):

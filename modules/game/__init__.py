@@ -1,2 +1,2 @@
-from modules.game.basegame import Game
+from modules.game.game import Game
 import os

@@ -49,3 +49,16 @@ def ValidGotoCondition(line : Token):
             return True
     return False
 
+
+def ValidFunctionStart(line : Token):
+    if len(line.subtokens) < 4:
+        return False
+    if line.subtokens[0].name != "func":
+            return False
+    if line.subtokens[2].name != "(":
+        return False
+    if line.subtokens[-1].name != ")":
+        return False
+            
+    return True
+

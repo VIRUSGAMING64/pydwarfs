@@ -3,14 +3,17 @@ from modules.game.objects import *
 from modules.game.map import *
 from modules.interpreter import *
 from modules.game.map import GameMap
+from modules.game.maths import *
 import logging
 import os
+
 logging.basicConfig(level=logging.DEBUG)
 
 DEFAULT_O_PATH = "gamedata/objets"
 DEFAULT_T_PATH = "gamedata/terrains"
 DEFAULT_M_PATH = "gamedata/maps"
 DEFAULT_C_PATH = "gamedata/entity"
+GREATER = 2**64 - 1
 
 class Game:
     m_path = DEFAULT_M_PATH
@@ -106,14 +109,53 @@ class Game:
                 except Exception as e:
                     print(f"Error loading creature [{e}] in {pth}")
 
+    def GetPerseption(self, c: Interpreter):
+        minAdis = GREATER #* no creo q vayan hacer un mapa tan grande
+        allx = 0
+        ally = 0
 
-    def GetPerseption(self):
-        for c in self.Creatures:
-            pass
+        minEdis = GREATER #* no creo q vayan hacer un mapa tan grande
+        Ex = 0 #* Este es los dx del enemy
+        Ey = 0       
+
+        currx = c.query("x")
+        curry = c.query("y")
+        allys = 0
+        enemis = 0
+
+        for cre in self.Creatures:
+            x=cre.query("x")
+            y=cre.query("y")
+            dis = p2dist(x,y,currx, curry)
+            if dis > c.vision:
+                continue
+            if cre.faction == c.faction:
+                allys += 1
+                if dis < minAdis:
+                    allx = parsedirection(x,currx)
+                    ally = parsedirection(y,curry)
+            else:
+                enemis += 1 
+                if dis < minEdis:
+                    Ex = parsedirection(x,currx)
+                    Ey = parsedirection(y,curry)
+
+        if minAdis == GREATER:
+            minAdis = -1
+        if minEdis == GREATER:
+            minEdis = -1
+
+        c.alloc("enemy_dx", Ex)
+        c.alloc("enemy_dy", Ey)
+        c.alloc("ally_dx", allx)
+        c.alloc("ally_dy", ally)
+        c.alloc("enemy_dist", minEdis)
+        c.alloc("ally_dist", minAdis)
+        c.alloc("allies_near", allys)
 
     def Step(self):
         for creature in self.Creatures:
-            self.GetPerseption()
+            self.GetPerseption(creature)
             creature.Step()
 
     def __dict__(self):

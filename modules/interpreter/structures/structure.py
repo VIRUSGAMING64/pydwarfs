@@ -20,5 +20,5 @@ class Structure(Token):
         sup = super().__dict__()
         if self.expr == None:
             self.expr = []
-        sup["Expr"] = [ex.__dict__() for ex in self.expr]
+        sup["expr"] = [ex.__dict__() for ex in self.expr]
         return sup

@@ -1,7 +1,12 @@
 FROM python as pydwarf
 
 WORKDIR /pydwarf
-COPY . .
-RUN ls
+
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN bash run.sh
+
+COPY . .
+
+EXPOSE 1200 9090
+
+CMD ["python", "main.py"]

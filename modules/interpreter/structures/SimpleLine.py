@@ -14,21 +14,10 @@ class SingleLine(Structure):
         self.name = "__LINE__"
         self.value = self.name
         self.data = {}
-
-    def IsGoto(self):
-        for i,elem in enumerate(self.base_token.subtokens):
-            if elem.name == "goto":
-                self.subtokens = self.base_token.subtokens[i : ]
-                self.expr = self.base_token.subtokens[1:i]
-                return True
-        return False
-
-    def Execute(self, parser: Parser):
-        val = parser.EvalExpr(self.subtokens)
-        return NORMAL, None
     
     def __dict__(self):
         di = super().__dict__()
         del di["value"]
         del di["data"]
+        del di["expr"]
         return di

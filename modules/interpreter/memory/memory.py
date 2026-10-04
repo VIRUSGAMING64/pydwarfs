@@ -29,9 +29,10 @@ class Memory:
             value = value[:size]
         while len(value) < size:
             value.append(None)
-        self.addrs[addr] = None
+        del self.addrs[addr]
         newaddr = uuid.uuid4().hex
         self.addrs[newaddr] = value
+        return newaddr
 
     def __dict__(self):
         di = {}

@@ -39,6 +39,11 @@ class AstBuilder:
                 Ast.append(li)
                 i += 1
                 continue
+            elif tk_utils.ValidFunctionStart(subtok):
+                end , structures = self.ExtractStructures(i + 1, toks)
+                func = Function([subtok] + structures)
+                i = end + 1
+                Ast.append(func)
             elif tk_utils.ValidLoop(subtok):
                 end , structures = self.ExtractStructures(i + 1, toks)
                 lo = Loop([toks[i]]  + structures)
