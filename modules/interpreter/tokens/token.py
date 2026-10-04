@@ -14,6 +14,7 @@ class Token:
     data = None
 
     def Execute(self,parser):
+        print(self.__dict__())
         raise "Token not executable"
         
     def __init__(self,expr):

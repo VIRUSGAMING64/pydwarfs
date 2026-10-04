@@ -9,11 +9,28 @@ class Function(Structure):
     def __init__(self, lines, parent=None):
             super().__init__(lines[1:], parent)
             self.type = FUNCTION
-            self.name = "__FUNCTION__"
             base = lines[0]
-            base.subtokens = base.subtokens[3:]
-            base.subtokens.pop()
-            print("her:",base.__dict__())
+
+            self.name = base.subtokens[1].name 
+            self.args = []
+            next = True
+            for token in base.subtokens[3:-1]:
+                if next:
+                    if token.type != VARIABLE:
+                        raise SintaxisException(
+                            f"Invalid function argument [{token.value}]"
+                        )
+                    self.args.append(token)
+                elif token.name != ",":
+                    raise SintaxisException(
+                        f"Expected comma in function declaration at [{token.value}]"
+                    )
+                next = not next
+
+            if base.subtokens[3:-1] and next:
+                raise SintaxisException("Expected function argument after comma")
+
+            base.subtokens = base.subtokens[3:-1]
             self.line = base.line
 
     def __dict__(self):
@@ -21,19 +38,18 @@ class Function(Structure):
         del di["data"]
         del di["value"]
         del di["expr"]
+        di["args"] = [arg.__dict__() for arg in self.args]
         return di
 
     def Execute(self, parser):
-        return super().Execute(parser)
-    
-
+        return NORMAL, None
 
 
 """
-
+*Code extracted from https://github.com/VIRUSGAMING64/cryton2
+*My first interpreter 
 
     def extract_funcs_call(self,toks, mem:Memory):
-
         tokens:list = toks.tokens
         for i in range(len(tokens)):
             if i + 1 >= len(tokens):

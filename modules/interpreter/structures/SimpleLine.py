@@ -21,3 +21,8 @@ class SingleLine(Structure):
         del di["data"]
         del di["expr"]
         return di
+    
+    def Execute(self, parser: Parser):
+        val = parser.EvalExpr(self.subtokens)
+        return NORMAL, None
+    
