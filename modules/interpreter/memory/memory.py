@@ -13,7 +13,7 @@ class Memory:
         return addr
 
     def alloc(self, key, value):
-        self.addrs[key] = value
+        self.addrs[key] = value.copy()
 
     def query(self, key):
         return self.addrs.get(key, None)

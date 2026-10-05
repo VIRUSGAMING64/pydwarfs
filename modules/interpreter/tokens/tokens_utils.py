@@ -61,4 +61,3 @@ def ValidFunctionStart(line : Token):
         return False
             
     return True
-

@@ -3,7 +3,7 @@ from modules.interpreter.statics import *
 from modules.interpreter.memory import *
 from modules.interpreter.exceptions import *
 from modules.interpreter.parser.parserutils import *
-from typing import TYPE_CHECKING
+
 
 class Token:
     subtokens: list[Token] = None
@@ -17,11 +17,13 @@ class Token:
         print(self.__dict__())
         raise "Token not executable"
         
-    def __init__(self,expr):
+    def __init__(self,expr, type=None):
         self.data = {}
         self.value = expr
         self.name = expr
         self.subtokens = []
+        if type != None:
+            self.type = type
 
     def copy(self):
         new = Token(
@@ -31,6 +33,8 @@ class Token:
         new.value = self.value
         new.line = self.line
         new.type = self.type
+        if self.data == None:
+            self.data = {}
         new.data = self.data.copy()
         return new
 
@@ -134,8 +138,6 @@ class Token:
         return NIL | self.IsNum()| self.isLabel() |self.IsOperator(ops) | self.IsKeyword(kwds) | self.VarName() | self.IsString()
 
 
-
-
 class Parser:
     memory: Memory = None
     def __init__(self,mem: Memory):
@@ -147,14 +149,13 @@ class Parser:
         values = []
         unary = True
 
-
         for lineidx, elem in enumerate(toks):
             if elem.type & VARIABLE:
                 value = self.memory.query(elem.name)
                 if value == None and (lineidx != 0 or toks[lineidx + 1].value != "="):
                     raise MissingVariable(elem.name)
-                elem.value = value
-
+                if value != None:
+                    elem.value = value.value
 
         for lineidx, elem in enumerate(toks):       
             if elem.name == "(":
@@ -163,7 +164,7 @@ class Parser:
         
             elif elem.name == ")":  
                 if len(operations) == 0:
-                    raise ExpresionException(toks)
+                    raise ExpresionException("Invalid expresion at line")
                 while operations[-1].name != "(":
                     self.process(values, operations, None)
 

@@ -26,6 +26,7 @@ class Interpreter:
             with open(filename,"rb") as f:
                 rawSrc = f.read()
 
+        self.memory = Memory()
         errors = {}
         attrs = [
             "creature", 
@@ -37,8 +38,8 @@ class Interpreter:
         lexed = Lexer(rawSrc, errors)
         logging.debug(errors["Errors"])
         self.ast = AstBuilder(lexed.TokenizeSource())
-        self.ast.ExtractStructures()
-        self.memory = Memory()
+        self.ast.ExtractStructures(memory=self.memory)
+       
         idx = self.FindLabel("start", self.ast.Ast)
         if idx == -1:
             raise Exception("Entry point unknow")
@@ -60,16 +61,18 @@ class Interpreter:
             val = li.subtokens[1].value
             if not (head in attrs):
                 raise Exception("Invalid header")        
-            self.__setattr__(head, val)                
-            self.memory.alloc(head, val)
+            self.__setattr__(head, val)  
+            value = Token(val)
+            value.GetType(operators, keywords)              
+            self.memory.alloc(head, value)
 
         #* Checking creatures attributes
         for attr in attrs:
             if self.__getattribute__(attr)==None:
                 raise Exception(f"Creature with missing attribute [{attr}] error at file: [{filename}]")
 
-        self.alloc("x", 0)
-        self.alloc("y", 0)
+        self.alloc("x", Token(0,NUMBER))
+        self.alloc("y", Token(0,NUMBER))
 
         self.line = idx
         self.parser = Parser(self.memory)

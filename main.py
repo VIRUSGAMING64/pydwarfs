@@ -5,16 +5,6 @@ from threading import Thread
 import json
 import asyncio
 
-def TestAstBuild():
-    di = []
-    tokens = Lexer(open("codigotest.txt","r").read(10000000), {}).TokenizeSource()
-    ast = AstBuilder(tokens)
-    ast.ExtractStructures()
-    di = ast.__json__()
-    s = json.dumps(di, indent="   ")
-    open("ast.json", "w").write(s)
-
-
 def TestGameLoading():
     g = Game()
     g.LoadTerrains()
@@ -23,17 +13,6 @@ def TestGameLoading():
     g.LoadCreatures()
         
     open("gamedump.txt","w").write((json.dumps(g.__dict__(), indent="    ")))
-
-
-def TestExprParser():
-    tokens = Lexer(open("codigotest.txt","r").read(10000000), {}).TokenizeSource()
-    ast = AstBuilder(tokens)
-    ast.ExtractLoops()
-    ast.ExtractConditions()
-    int = Parser()
-    for line in ast.Ast:
-        res = int.EvalExpr(line.subtokens)
-        #print(res.__dict__())
 
 def TestServerCom():
     path = "./src"
@@ -57,11 +36,14 @@ def TestServerCom():
 
 def InterTest():
     iner = Interpreter(open("codigotest.txt","r").read())
+    di = iner.ast.__json__()
+    s = json.dumps(di, indent="   ")
+    open("ast.json", "w").write(s)
     while iner.Step():
         pass
 
-    print(iner.memory.addrs)
-
+    for i in iner.memory.addrs:
+        print(i,":",iner.memory.addrs[i].value)
 #TestAstBuild()
 #TestGameLoading()
 #TestExprParser()

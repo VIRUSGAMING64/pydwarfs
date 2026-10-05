@@ -49,28 +49,6 @@ class Function(Structure):
 *Code extracted from https://github.com/VIRUSGAMING64/cryton2
 *My first interpreter 
 
-    def extract_funcs_call(self,toks, mem:Memory):
-        tokens:list = toks.tokens
-        for i in range(len(tokens)):
-            if i + 1 >= len(tokens):
-                break
-            if (tokens[i].type & VARIABLES) and tokens[i + 1].expr == "(":
-                name = tokens[i].data["name"]
-                fu = mem.query(name)
-                while fu.type & VARIABLES:
-                    fu = mem.query(fu.data["name"])
-                                    
-                if not isinstance(fu, mem_Func):
-                    raise CallNonFuncException(toks)
-                
-                eofc,args = self.funcat(i,tokens)
-                func = Token("__func__", FUNCCALL, []) 
-                func.data["args"] = []
-                func.data["name"] = name
-                for arg in args:
-                    func.data["args"].append(arg)
-                del tokens[i : eofc + 1]
-                tokens.insert(i, func)
 
     def call(self, currline, args:list, mem:Memory):
         m_func = mem.query(currline.data["name"])

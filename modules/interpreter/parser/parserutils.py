@@ -21,7 +21,7 @@ def getPrio(value):
 
 def asign(a:"Token", b:"Token", mem: Memory):
     a.value = b.value
-    mem.alloc(a.name, a.value)
+    mem.alloc(a.name, a)
    
     
 def UnaryOP(a,op):
