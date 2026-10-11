@@ -14,6 +14,17 @@ class SingleLine(Structure):
         self.name = "__LINE__"
         self.value = self.name
         self.data = {}
+
+    def copy(self):
+        li = SingleLine.__new__(SingleLine)
+        li.base_token=self.base_token
+        li.type =  LINE
+        li.subtokens = [x.copy() for x in self.subtokens]
+        li.name = "__LINE__"
+        li.line = self.line
+        li.data = self.data
+        li.value = ""
+        return li
     
     def __dict__(self):
         di = super().__dict__()
@@ -22,7 +33,14 @@ class SingleLine(Structure):
         del di["expr"]
         return di
     
+
     def Execute(self, parser: Parser):
-        val = parser.EvalExpr(self.subtokens)
-        return NORMAL, None
+        code = NORMAL
+        if self.subtokens[0].value == "ret":
+            self.subtokens.pop(0)
+            code = RETURNING
+        
+        opcode, val = parser.EvalExpr(self.subtokens)
+        
+        return code|opcode, val.copy()
     

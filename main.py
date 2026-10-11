@@ -4,15 +4,8 @@ from gui.server.server import *
 from threading import Thread
 import json
 import asyncio
-
-def TestGameLoading():
-    g = Game()
-    g.LoadTerrains()
-    g.LoadObjects()
-    g.LoadMaps()
-    g.LoadCreatures()
-        
-    open("gamedump.txt","w").write((json.dumps(g.__dict__(), indent="    ")))
+import sys
+sys.setrecursionlimit(2**30)
 
 def TestServerCom():
     path = "./src"
@@ -44,8 +37,6 @@ def InterTest():
 
     for i in iner.memory.addrs:
         print(i,":",iner.memory.addrs[i].value)
-#TestAstBuild()
-#TestGameLoading()
-#TestExprParser()
+
 InterTest()
 #TestServerCom()

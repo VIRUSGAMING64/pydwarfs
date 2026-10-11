@@ -4,16 +4,23 @@ from modules.interpreter.statics import *
 import modules.interpreter.tokens.tokens_utils as tk_utils
 from modules.interpreter.exceptions import *
 from modules.interpreter.structures.structure import *
-
+from modules.interpreter.statics import *
 class FuncCall(Structure):
-    args: list[Token] = None
+    args: list[Token]
     def __init__(self, name, args, line):
         if not isinstance(args, list):
             raise Exception("args not is a list")
         self.type = FUNCCALL
         self.args = args
         self.name = name
+        self.line = line
+        self.subtokens = []
+        self.value = ""
+        self.data = {}
 
+    def copy(self):
+        return FuncCall(self.name, self.args, self.line)
+        
     def __dict__(self):
         di = super().__dict__()
         del di["data"]
@@ -28,71 +35,57 @@ class FuncCall(Structure):
             di["args"].append(t)  
         return di
 
-
-"""
-*Code extracted from https://github.com/VIRUSGAMING64/cryton2
-*My first interpreter 
-
-    def call(self, currline, args:list, mem:Memory):
-        m_func = mem.query(currline.data["name"])
-        while (m_func.type & FUNC) == 0:
-            m_func = mem.query(m_func.data["name"])
-            
-        code = m_func.code      
-
-        if len(m_func.args) != len(args):
-            if debug.DEBUG:
-                print(m_func.args, args)
-            raise CallFuncException(currline)
+    def Execute(self,parser, mem:Memory):
+        func = mem.query(self.name)
+        if func is None:
+            raise MissingVariable(self.name)
         
-        if code == BUILTIN:
-            #* Aqui chequeo si la llamada a la funcion es de una builtin
-            #* (funciones implementadas en python para el lang)
-            name = m_func.name
-            try:
-                ret = in_builtin.__builtins_calls__[name](*args)
-            except Exception as e:
-                raise BuiltinException(e)
-            if ret == None:
-                ret = Token(ret, GetType(ret))
-            return ret.copy()
+        if not (func.type & FUNCTION):
+            raise MissingVariable(self.name)
+        args = []
 
-        newmem = Memory() 
-        #* Aqui se crea un nuevo memory  segment para esta llamada
-        #* en el for se declaran en ese nuevo segmento las variables que se pasana como argumento
-        for i,arg_name in enumerate(m_func.args):
-            newmem.alloc_var(
-                arg_name, args[i].copy(), False, False
+    
+        print(len(args), len(func.args), len(self.args))        
+        if len(self.args) > 0:   
+            args = [parser.EvalExpr(argument)[1] for argument in self.args]
+        
+        if len(args) != len(func.args):
+            raise CallFuncException(
+                f"Invalid number of arguments for [{self.name}]"
             )
+
+
+        local_memory = Memory()
+        for i,value in enumerate(args):
+            local_memory.alloc(func.args[i].name, value)
+
+        print("calling function")
+        # Function definitions remain visible so recursive calls can resolve.
+        for name, value in parser.memory.addrs.items():
+            if value.type & FUNCTION:
+                local_memory.addrs[name] = value
+            if local_memory.query(name) == None:
+                local_memory.addrs[name] = mem.addrs[name]
         
-        #* en este for las variables globales se pasan por referencia a la siguiente llamada de funcion
-        for addr in mem.mem:
-            if mem.mem[addr].isglob == False:
+        local_parser = Parser(local_memory)
+        idx = 0 
+        while idx < len(func.subtokens):
+            statement = func.subtokens[idx]
+            print("jaja",statement.__dict__())
+            if statement.subtokens[0].value == "ret":
+                cl =  local_parser.EvalExpr(statement.subtokens[1:])[1].copy()
+                R = Token(cl.value)
+                R.GetType(operations,keywords)
+                return R
+            returned, value = statement.Execute(local_parser)
+            print(returned)
+
+            if returned & RETURNING:
+                cl = Token(value.value)
+                cl.GetType(operations,keywords)
+                return cl
+            if returned & CONTINUE:
                 continue
-            if newmem.mem.get(addr) != None:
-                continue 
-            newmem.mem[addr] = mem.mem[addr] #* Aqui lo que se hace es coger la referencia directa a las globales   
-           
-        code, ret = Evaluator(code, 0 , self.out, newmem, True).run()       
-        if ret == None:
-            ret = 0 #* defalut return value of function
-            ret = Token(ret, GetType(ret))
-        ret.type = GetType(ret.type)
-        return ret.copy() 
 
-    def callfuncs(self, toks, li):
-        for i in range(len(toks.tokens)):
-            if toks.tokens[i].type & FUNCCALL:
-                args = []
-                for arg in toks.tokens[i].data["args"]:
-                    if arg == []:
-                        continue
-                    arg = self.evalTokens(arg, li)
-                    args.append(arg)
-                try:
-                    toks.tokens[i] = self.call(toks.tokens[i], args, self.memory)
-                except TypeError as e:
-                    self.out["Errors"].append(f"Invalid argument type at line {toks.data.get("line", "unknow")}")
-                    return 0
-
-"""
+            idx += 1 
+        return Token(0, NUMBER).copy()

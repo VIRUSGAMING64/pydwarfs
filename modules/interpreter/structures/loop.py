@@ -27,4 +27,5 @@ class Loop(Structure):
             return CONTINUE, None
 
     def EvalCond(self,parser: Parser):
-        return parser.EvalExpr(self.expr).value
+        opcode, val = parser.EvalExpr(self.expr)
+        return val.value

@@ -1,18 +1,23 @@
 
 from modules.interpreter.tokens.token import *
 
+def ToksCompression(tokens: list[Token]):
+    s = ""
+    for i in tokens:
+        s += i.name + " "
+    s=s.removesuffix(" ")
+    tok = Token(s)
+    tok.line = LINE
+    tok.subtokens = [tk.copy() for tk in tokens]
+    return tok
 
-
-#* Exit codes from intructions
-NORMAL = 1
-FINDING = 2
-RETURING = 4
-CONTINUE = 8
 
 class Structure(Token):
     expr:list[Token] =  None
 
-    def __init__(self, lines:list[Token] , parent = None):
+    def __init__(self, lines , parent = None):
+        super().__init__(ToksCompression(lines).value)
+        self.GetType(operations, keywords)
         self.parent = parent
         self.subtokens = lines
         

@@ -1,3 +1,4 @@
+
 #* Types
 NIL = 0
 NUMBER = 1
@@ -15,6 +16,12 @@ LABEL = 2048
 GOTO = 4096
 FUNCTION = 8192
 FUNCCALL = 16384
+
+#* OPCODES
+NORMAL = 1
+FINDING = 2
+RETURNING = 4
+CONTINUE = 8
 
 P0 = [
     "==",

@@ -1,23 +1,13 @@
 from modules.interpreter.structures import *
 
-
-def ToksCompression(tokens: list[Token]):
-    s = ""
-    for i in tokens:
-        s += i.name + " "
-    s=s.removesuffix(" ")
-    tok = Token(s)
-    tok.line = LINE
-    tok.subtokens = [tk.copy() for tk in tokens]
-    return tok
-
 class AstBuilder:
-    Ast:list[Token|Loop|Condition] = None
-    labels:dict = None
+    Ast:list[Token|Loop|Condition] 
+    labels:dict 
 
     def __init__(self, code: list[Token]):
         self.Ast = code
         self.labels = {}
+        self.prefuncs = {}
         self.funcs = []
 
     def funcat(self, i , tokens):
@@ -48,7 +38,8 @@ class AstBuilder:
 
             if opens == 0:
                 arg.pop()
-                args.append(arg)
+                if len(arg) > 0:
+                    args.append(arg)
                 return j,args
         
         raise CallFuncException("Not closed function call !!")#* La cantidad de "(" > ")" entonces faltan ) para algunos ( 
@@ -60,17 +51,16 @@ class AstBuilder:
                 break
             if (tokens[i].type & VARIABLE) and tokens[i + 1].value == "(":
                 name = tokens[i].name
-                fu:Token = mem.query(name) #TODO GET FUNCTION FROM MEMORY
+                fu = self.prefuncs.get(name,None)
 
-                if fu == None or not (fu.type & FUNCTION):
+                if fu == None:
                     raise MissingVariable(name)
                 
                 eofc,args = self.funcat(i,tokens)
                 for a in args:
                     self.extract_funcs_call(a, mem)
-
-                func = FuncCall(name,args, tokens[0].line) 
                 
+                func = FuncCall(name,args, tokens[0].line) 
                 del tokens[i : eofc + 1]
                 print(func.__dict__())
                 tokens.insert(i, func)
@@ -79,7 +69,8 @@ class AstBuilder:
     def __json__(self):
         return [t.__dict__() for t in self.Ast]
 
-    def ExtractStructures(self, start=0, toks = None, memory = None):
+
+    def ExtractStructures(self, start=0, toks = None, memory:Memory = None, infunc = False):
         
         i = start
         Ast = []
@@ -94,6 +85,8 @@ class AstBuilder:
                 self.extract_funcs_call(subtok.subtokens, memory)
 
             if tk_utils.ValidLabel(subtok):
+                if infunc:
+                    raise SintaxisException("Can't create label into function")
                 li = Label(subtok)
                 n = self.labels.get(li.name, 0)+1
                 if n >= 2:
@@ -102,31 +95,35 @@ class AstBuilder:
                 Ast.append(li)
                 i += 1
                 continue
+
             elif tk_utils.ValidFunctionStart(subtok):
                 if start != 0:
                     raise Exception("Not declare functions in structures")
 
-                func = Function([subtok] )
-                memory.alloc(func.name, func)
+                declaration = subtok.copy()
+                name = declaration.subtokens[1].name
+                self.prefuncs[name] = name
 
-                end , structures = self.ExtractStructures(i + 1, toks, memory)
+                end , structures = self.ExtractStructures(i + 1, toks, memory, infunc|True)
+                tfunc = Function([declaration.copy()] + structures)
+                memory.alloc(tfunc.name, tfunc)
 
-                func = Function([subtok] + structures)
-                memory.alloc(func.name, func)
                 i = end + 1
-                Ast.append(func)
+                Ast.append(tfunc)
                 
             elif tk_utils.ValidLoop(subtok):
-                end , structures = self.ExtractStructures(i + 1, toks, memory)
+                end , structures = self.ExtractStructures(i + 1, toks, memory,infunc)
                 lo = Loop([toks[i]]  + structures)
                 Ast.append(lo)
                 i = end+1
             elif tk_utils.ValidCondition(subtok):
-                end , structures = self.ExtractStructures(i + 1, toks, memory)
+                end , structures = self.ExtractStructures(i + 1, toks, memory,infunc)
                 cond = Condition([toks[i]]  + structures)
                 Ast.append(cond)
                 i = end+1
-            elif tk_utils.ValidGotoCondition(subtok):                  
+            elif tk_utils.ValidGotoCondition(subtok):   
+                if infunc:
+                    raise SintaxisException("Can't create goto into function")               
                 for j,elem in enumerate(toks[i].subtokens):
                     if elem.name == "goto":
                         expr = toks[i].subtokens[0:j]
@@ -157,6 +154,8 @@ class AstBuilder:
                     i += 1
                     continue  
                 if tk_utils.validGoto(lie):
+                    if infunc:
+                        raise SintaxisException("Can't create goto into function")               
                     lie = Goto(lie.subtokens[1])
 
                 Ast.append(

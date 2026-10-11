@@ -110,5 +110,6 @@ class Interpreter:
             return True
         elif code == CONTINUE:
             self.line -= 1
+        
         self.line+=1
         return True

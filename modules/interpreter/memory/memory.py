@@ -3,21 +3,29 @@ import uuid
 from modules.interpreter.exceptions import MemoryException
 
 class Memory:
-    addrs = {}
-    def __init__(self, data = {}):
-        self.addrs = data
+    addrs : dict
 
+    def __init__(self, data = None):
+        if data == None:
+            data = {}
+        self.addrs = data
+                
     def malloc(self, size):
         addr = uuid.uuid4().hex
         self.addrs[addr] = [None] * size
         return addr
 
     def alloc(self, key, value):
-        self.addrs[key] = value.copy()
+        if self.addrs.get(key,None) != None:
+            self.addrs[key].value = value.value
+        else:
+            self.addrs[key] = value.copy()
 
     def query(self, key):
-        return self.addrs.get(key, None)
-
+        val = self.addrs.get(key, None)
+        if val != None:
+            return  val.copy()
+        return val
     def realloc(self, addr, size):
         if self.addrs.get(addr) == None:
             #* No existe este addr

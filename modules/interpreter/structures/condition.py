@@ -13,6 +13,8 @@ class Condition(Structure):
         self.type = CONDITION
         self.name = "__CONDITION__"
         self.expr = base.subtokens[1 : ]
+        self.value = ""
+        self.data ={}
         self.ip = 0
 
     def __dict__(self):
@@ -21,6 +23,18 @@ class Condition(Structure):
         del di["data"]
         return di
 
+    def copy(self):
+        cond = Condition.__new__(Condition)
+        cond.base_token = self.base_token
+        cond.data = self.data
+        cond.ip = 0
+        cond.value = ""
+        cond.line = self.line
+        cond.expr = self.expr
+        cond.name = self.name
+        cond.type = self.type
+        cond.subtokens = [x.copy() for x in self.subtokens]
+        return cond
 
     def IsGoto(self):
         for i,elem in enumerate(self.base_token.subtokens):
@@ -34,18 +48,24 @@ class Condition(Structure):
         if self.ip == 0:
             if not self.EvalCond(parser):
                 return NORMAL,None
-        l=self.ip
-        self.ip = 0
-        expr=self.subtokens[l]
-        code, val = expr.Execute(parser)        
+        print(self.ip, len(self.subtokens))
+        if len(self.subtokens) == self.ip:
+            print(self.subtokens[0].__dict__())
+            input()
+            
+        expr = self.subtokens[self.ip]
+        re = expr.Execute(parser)
+        code, val = re[0], re[1]
         if code != NORMAL:
+            print(code & RETURNING)
             return code,val
-        self.ip = l + 1
+        self.ip += 1
+        
         if self.ip == len(self.subtokens):    
             return NORMAL, None
-        else:
-            return CONTINUE, None
+        
+        return CONTINUE, None
 
     def EvalCond(self,parser: Parser):
-        tok = parser.EvalExpr(self.expr)
+        opcode, tok = parser.EvalExpr(self.expr)
         return tok.value
