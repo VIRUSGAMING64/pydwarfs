@@ -102,6 +102,8 @@ class AstBuilder:
 
                 declaration = subtok.copy()
                 name = declaration.subtokens[1].name
+                if self.prefuncs.get(name, None) != None:
+                    raise Exception("Functions with same name are detected")
                 self.prefuncs[name] = name
 
                 end , structures = self.ExtractStructures(i + 1, toks, memory, infunc|True)
