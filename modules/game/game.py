@@ -145,13 +145,14 @@ class Game:
         if minEdis == GREATER:
             minEdis = -1
 
-        c.alloc("enemy_dx", Token(Ex, NUMBER))
-        c.alloc("enemy_dy", Token(Ey, NUMBER))
-        c.alloc("ally_dx", Token(allx, NUMBER))
-        c.alloc("ally_dy", Token(ally, NUMBER))
-        c.alloc("enemy_dist", Token(minEdis, NUMBER))
-        c.alloc("ally_dist", Token(minAdis, NUMBER))
-        c.alloc("allies_near", Token(allys, NUMBER))
+        c.memory.alloc_const("enemy_dx", Token(Ex, NUMBER))
+        c.memory.alloc_const("enemy_dy", Token(Ey, NUMBER))
+        c.memory.alloc_const("ally_dx", Token(allx, NUMBER))
+        c.memory.alloc_const("ally_dy", Token(ally, NUMBER))
+        c.memory.alloc_const("enemy_dist", Token(minEdis, NUMBER))
+        c.memory.alloc_const("ally_dist", Token(minAdis, NUMBER))
+        c.memory.alloc_const("allies_near", Token(allys, NUMBER))
+        
         
     def Step(self):
         for creature in self.Creatures:

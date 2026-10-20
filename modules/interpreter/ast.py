@@ -7,11 +7,14 @@ class AstBuilder:
     def __init__(self, code: list[Token]):
         self.Ast = code
         self.labels = {}
+        self.gotoslabels = [] 
         self.prefuncs = {}
         self.builtin = {}
+        
         for i in builtins:
             self.builtin[i] = True
             self.prefuncs[i] = i
+
         self.funcs = []
 
     def funcat(self, i , tokens):
@@ -140,7 +143,9 @@ class AstBuilder:
                         lie = SingleLine([cond.subtokens[0]] + cond.subtokens[0].subtokens)
                         if tk_utils.validGoto(lie):
                             lie = Goto(lie.subtokens[1])
-                        cond.subtokens[0] = lie
+                            self.gotoslabels.append(lie.label)    
+                            cond.subtokens[0] = lie
+                        
                         Ast.append(cond)
                         i += 1
                         break
@@ -162,6 +167,7 @@ class AstBuilder:
                     if infunc:
                         raise SintaxisException("Can't create goto into function")               
                     lie = Goto(lie.subtokens[1])
+                    self.gotoslabels.append(lie.label) 
 
                 Ast.append(
                     lie
@@ -173,3 +179,16 @@ class AstBuilder:
             return
         
         raise Exception(f"Not closed strucure starting at line [{start}]")
+
+
+def FindLabel(label, lines)-> int:
+    for i, elem in enumerate(lines):
+        if elem.type&LABEL:
+            if elem.type == LABEL and elem.name == label:
+                return i
+        elif label != "start": #* Aqui se evita que start: este dentro de algo
+            pos = FindLabel(label, elem.subtokens)
+            if pos != -1:
+                elem.ip = pos
+                return i
+    return -1

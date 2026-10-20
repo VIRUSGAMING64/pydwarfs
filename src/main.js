@@ -13,7 +13,7 @@ let com = new Communication("ws://127.0.0.1:9090");
 let BaseGame = null;
 let conf = null;
 function RawData() {
-    console.log(com.Show());
+    com.Show();
     let data = com.Recive();
     if (data.data == undefined) {
         return "";
@@ -37,6 +37,17 @@ function RenderizeScreen(forse = false) {
         }
         mapa = GetMaps(data)[0].Grid;
         creatures = GetCreatures(data);
+        if (BaseGame == null) {
+            const menu = document.getElementById("menu");
+            for (let i = 0; i < creatures.length; i += 1) {
+                let c = creatures[i];
+                let button = document.createElement("button");
+                button.innerText = c.memory.creature.name;
+                button.className = "w-30 h-8 m-1 gap-1 text-white bg-gray-900";
+                menu?.appendChild(button);
+                console.log(c);
+            }
+        }
     }
     if (conf == null) {
         let sizex = mapa[0].length;
@@ -54,13 +65,16 @@ function RenderizeScreen(forse = false) {
         BaseGame.grid = conf;
     }
     if (BaseGame.paused && !forse) {
-        console.log("juego pausado");
         return;
     }
     BaseGame.DrawGame(mapa, creatures);
 }
 setInterval(() => {
-    if (!BaseGame?.paused) {
+    if (BaseGame == null) {
+        RenderizeScreen(true);
+    }
+    else if (!BaseGame?.paused) {
+        console.log("cosa");
         BaseGame?.Step(com);
         RenderizeScreen();
     }
@@ -81,7 +95,6 @@ function Step() {
     if (BaseGame == null) {
         return;
     }
-    console.log("haciendo un step manual");
     BaseGame.Step(com);
     RenderizeScreen(true);
 }

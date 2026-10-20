@@ -5,7 +5,6 @@ from threading import Thread
 import json
 import asyncio
 import sys
-sys.setrecursionlimit(2**30)
 
 def TestServerCom():
     path = "./src"
@@ -31,8 +30,14 @@ def InterTest():
     di = iner.ast.__json__()
     s = json.dumps(di, indent="   ")
     open("ast.json", "w").write(s)
-    while iner.Step():
-        pass
+    while 1:
+        Game.GetPerseption(Game(), iner)
+        p = iner.Step()
+        for i in iner.memory.addrs:
+            print(i, " allocated with value: ", iner.memory.query(i).value)
+        input("==================================================")
+        if not p:
+            break
 
-InterTest()
-#TestServerCom()
+#InterTest()
+TestServerCom()

@@ -10,9 +10,9 @@ class InterpreterException(Exception):
         self.error = self.error.replace("__line__", str(line))
 
 class MemoryException(InterpreterException):
-    def __init__(self):
+    def __init__(self, err = ""):
         super().__init__()
-        self.error = "Memory exception at line [__line__]"
+        self.error = "Memory exception at line [__line__]" + " " + err
 
 
 class MissingVariable(InterpreterException):

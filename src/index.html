@@ -1,43 +1,43 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <script src="tailwind.js"></script>
-     <link rel="stylesheet" href="style.css">
-    <title>pydwarf</title>
-  </head>
-  <body class="bg-red-950">
-    <script type="module" src="/main.js"></script>
-    <div class="animate flex">
-      <aside class="sidebar" id="sidebar">
-        <div class="logo">MiPanel</div>
-        <nav class="menu">
-          <div class="relative">
-            <button
-              id="btn-pause"
-              class="w-30 h-8 m-1 gap-1 text-white bg-gray-900"
-            >
-              Pausar simulacion
-            </button>
-            <button
-              id="btn-continue"
-              class="w-30 h-8 m-1 gap-1 text-white bg-gray-900"
-            >
-              Continuar
-            </button>
-            <button
-              id="btn-step"
-              class="w-30 h-8 m-1 gap-1 text-white bg-gray-900"
-            >
-              Step
-            </button>
-          </div>
-        </nav>
-      </aside>
 
-      <div id="draw"></div>
-    </div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <script src="tailwind.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>pydwarf</title>
+</head>
+
+<body class="bg-red-950">
+  <script type="module" src="/main.js"></script>
+  <div class="animate flex">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">MiPanel</div>
+      <nav class="menu" id = "menu">
+        <div class="flex">
+          <button id="btn-pause" class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">
+            Pausar
+          </button>
+          <button id="btn-continue" class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">
+            Continuar
+          </button>
+          <button id="btn-step" class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">
+            Step
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <button id="toggleBtn" class="toggle-btn" type="button" title="Mostrar / ocultar barra lateral"
+      aria-label="Mostrar / ocultar barra lateral" aria-controls="sidebar" aria-expanded="true">
+      <span class="toggle-icon toggle-icon-open" aria-hidden="true">&#9776;</span>
+      <span class="toggle-icon toggle-icon-closed" aria-hidden="true">&#9656;</span>
+    </button>
+
+    <div id="draw"></div>
+  </div>
+</body>
+
 </html>

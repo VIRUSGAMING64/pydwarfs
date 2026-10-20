@@ -85,7 +85,6 @@ class Lexer:
                 line_tokens.append(line)      
         for t in line_tokens:
             if t.type == NIL:
-                
                 raise SintaxisException(f"Sintax error with token [{t.value}]")           
 
         return line_tokens

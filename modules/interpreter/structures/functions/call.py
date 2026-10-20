@@ -41,7 +41,7 @@ class FuncCall(Structure):
         return di
 
     def Execute(self,parser, mem:Memory):
-    
+        args = []
         if len(self.args) > 0:   
             args = [parser.EvalExpr(argument)[1] for argument in self.args]
 

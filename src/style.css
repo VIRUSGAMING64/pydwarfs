@@ -14,9 +14,11 @@ body {
 /* Barra Lateral */
 .sidebar {
     width: 250px;
+    flex: 0 0 auto; /* que la barra no se aplaste al lado del canvas */
+    overflow: hidden; /* recorta el contenido mientras se desliza */
     background-color: #1e293b;
     color: #fff;
-    transition: all 0.3s ease;
+    transition: width 0.3s ease;
     display: flex;
     flex-direction: column;
 }
@@ -24,6 +26,11 @@ body {
 .sidebar.collapsed {
     width: 0px;
     overflow: hidden;
+}
+
+/* El contenido mantiene su ancho, asi sale deslizado en vez de re-maquetarse */
+.sidebar > * {
+    min-width: 250px;
 }
 
 .sidebar .logo {
@@ -67,11 +74,41 @@ body {
 }
 
 .toggle-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
+    position: fixed; /* siempre visible, incluso con la barra plegada */
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: #e2e8f0;
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
     cursor: pointer;
-    color: #334155;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background-color: #334155;
+}
+
+.toggle-icon-closed {
+    display: none;
+}
+
+/* Cambia el icono segun el estado de la barra */
+.sidebar.collapsed + .toggle-btn .toggle-icon-open {
+    display: none;
+}
+
+.sidebar.collapsed + .toggle-btn .toggle-icon-closed {
+    display: block;
 }
 
 /* Rejilla del Panel */
@@ -100,4 +137,10 @@ body {
     font-size: 28px;
     font-weight: bold;
     color: #1e293b;
+}
+
+nav {
+  display: flex;
+  flex-direction: column; /* Alinea los elementos en vertical */
+  gap: 10px; /* Espacio opcional entre cada elemento */
 }
