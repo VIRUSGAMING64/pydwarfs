@@ -1,3 +1,14 @@
+/**
+ 
+class CommunicationStatus:
+    STEP = 1
+    CLOSE = 2
+    CONTINUE = 3
+    SIGKILL = 4
+    SHOW = 5
+
+ */
+const SHOW = 5, STEP = 1;
 export default class Communication {
     ws;
     queue;
@@ -13,6 +24,12 @@ export default class Communication {
     }
     Closed() {
         console.log("closed");
+    }
+    Show() {
+        return this.Send(String(SHOW));
+    }
+    Step() {
+        return this.Send(String(STEP));
     }
     Send(data) {
         if (this.ws.OPEN != this.ws.readyState) {

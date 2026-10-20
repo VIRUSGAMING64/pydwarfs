@@ -7,6 +7,13 @@ import time
 from modules.game import *
 
 
+class CommunicationStatus:
+    STEP = 1
+    CLOSE = 2
+    CONTINUE = 3
+    SIGKILL = 4
+    SHOW = 5
+
 class WebSockServer:
     websock = None 
     game = None
@@ -25,18 +32,24 @@ class WebSockServer:
             out = self.Action(cli_data)
             await cli.send(out)
 
-    def Action(self, RawData):
-        data = "unknowaction"
-        if RawData == "STEP":
-            self.game.step()
-        elif RawData == "SHOW":
-            data = self.game.__dict__()
-            data = json.dumps(data)
-        elif RawData == "SIGKILL":
-            data = "KILLED"
-            self.game.kill()
-        return data
-
+    def Action(self, RawData: str):
+        try:
+            if not RawData.isnumeric():
+                return "invalid data" #* Aqui hay que hacer algo mejor para esto
+            code = int(RawData)
+            data = "" 
+            if code == CommunicationStatus.STEP:
+                self.game.Step()
+            elif code == CommunicationStatus.SHOW:
+                data = self.game.__dict__()
+                data = json.dumps(data)
+            elif code == CommunicationStatus.SIGKILL:
+                data = "KILLED"
+                self.game.kill()
+            return data
+        except Exception as e:
+            print(e)
+            exit(0)
 class Server:
     app:Flask = None
     def __init__(self, host:str, port:int, path:str):        

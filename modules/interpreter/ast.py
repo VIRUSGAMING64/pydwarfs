@@ -1,5 +1,5 @@
 from modules.interpreter.structures import *
-
+from modules.interpreter.structures.functions.builtin import builtins
 class AstBuilder:
     Ast:list[Token|Loop|Condition] 
     labels:dict 
@@ -8,6 +8,10 @@ class AstBuilder:
         self.Ast = code
         self.labels = {}
         self.prefuncs = {}
+        self.builtin = {}
+        for i in builtins:
+            self.builtin[i] = True
+            self.prefuncs[i] = i
         self.funcs = []
 
     def funcat(self, i , tokens):
@@ -61,8 +65,8 @@ class AstBuilder:
                     self.extract_funcs_call(a, mem)
                 
                 func = FuncCall(name,args, tokens[0].line) 
+                func.isbuiltin = self.builtin.get(name, False)
                 del tokens[i : eofc + 1]
-                print(func.__dict__())
                 tokens.insert(i, func)
 
 
@@ -79,7 +83,6 @@ class AstBuilder:
 
         while i < len(toks):
             subtok = toks[i]
-            print(subtok.name)
 
             if not tk_utils.ValidFunctionStart(subtok):
                 self.extract_funcs_call(subtok.subtokens, memory)

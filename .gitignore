@@ -13,3 +13,5 @@ ast.json
 instinct.pdf
 audit.md
 report.md
+devguide*
+tests/

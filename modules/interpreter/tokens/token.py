@@ -14,7 +14,6 @@ class Token:
     data:dict 
 
     def Execute(self,parser):
-        print(self.__dict__())
         raise Exception("Token not executable")
         return NORMAL, None
     
@@ -69,7 +68,6 @@ class Token:
             self.type = VARIABLE
             return VARIABLE
         
-        print(alphas)
         return NIL
 
     def IsKeyword(self, kwds):
@@ -146,6 +144,7 @@ class Parser:
         self.memory = mem
 
     def EvalExpr(self, toks:list[Token]):
+        toks = [x.copy() for x in toks]
         operations = []
         values = []
         unary = True
@@ -158,7 +157,6 @@ class Parser:
                 toks[lineidx] = elem
 
         for lineidx, elem in enumerate(toks):
-            print(elem.name,end = " ")
             if elem != None and (elem.type & VARIABLE):
                 value = self.memory.query(elem.name)
                 is_assignment = (
@@ -168,7 +166,6 @@ class Parser:
                     raise MissingVariable(elem.name)
                 if value != None:
                     elem.value = value.value
-        print("\n")
         for lineidx, elem in enumerate(toks):       
             if elem.name == "(":
                 operations.append(elem)
@@ -205,12 +202,7 @@ class Parser:
 
         if len(values) > 1 or len(operations)!=0:
             raise ExpresionException("Invalid expression")
-        
-        if len(values) == 0:
-            val = Token(0)
-            val.GetType(operators, keywords)
-            return NORMAL,val
-        
+            
         return NORMAL,values[0]
 
     def process(self, nums, oper):

@@ -95,7 +95,7 @@ class Game:
         try:
             data = os.listdir(self.c_path)
         except Exception as e:
-            logging.error(f"unable to load creatures [{e}]")
+            print(f"unable to load creatures [{e}]")
             return
         for pth in data:
             if not pth.endswith(".ins"):
@@ -118,14 +118,14 @@ class Game:
         Ex = 0 #* Este es los dx del enemy
         Ey = 0       
 
-        currx = c.query("x")
-        curry = c.query("y")
+        currx = c.query("x").value
+        curry = c.query("y").value
         allys = 0
         enemis = 0
 
         for cre in self.Creatures:
-            x=cre.query("x")
-            y=cre.query("y")
+            x=cre.query("x").value
+            y=cre.query("y").value
             dis = p2dist(x,y,currx, curry)
             if dis > c.vision:
                 continue
@@ -145,14 +145,14 @@ class Game:
         if minEdis == GREATER:
             minEdis = -1
 
-        c.alloc("enemy_dx", Ex)
-        c.alloc("enemy_dy", Ey)
-        c.alloc("ally_dx", allx)
-        c.alloc("ally_dy", ally)
-        c.alloc("enemy_dist", minEdis)
-        c.alloc("ally_dist", minAdis)
-        c.alloc("allies_near", allys)
-
+        c.alloc("enemy_dx", Token(Ex, NUMBER))
+        c.alloc("enemy_dy", Token(Ey, NUMBER))
+        c.alloc("ally_dx", Token(allx, NUMBER))
+        c.alloc("ally_dy", Token(ally, NUMBER))
+        c.alloc("enemy_dist", Token(minEdis, NUMBER))
+        c.alloc("ally_dist", Token(minAdis, NUMBER))
+        c.alloc("allies_near", Token(allys, NUMBER))
+        
     def Step(self):
         for creature in self.Creatures:
             self.GetPerseption(creature)

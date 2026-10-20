@@ -22,5 +22,8 @@ class Routes:
 
     def getfile(self,path):  
         path = os.path.join(self.base_path, path)
-        with open(path) as file:
-            return flask.Response(file.read(), mimetype=get_mime_type(path))
+        try:
+            with open(path) as file:
+                return flask.Response(file.read(), mimetype=get_mime_type(path))
+        except:
+            return flask.Response("", status=404)

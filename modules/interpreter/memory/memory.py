@@ -24,7 +24,7 @@ class Memory:
         di = {}
         for i in self.addrs:
             if not isinstance(self.addrs[i], int|str):
-                di[i] = self.addrs[i].copy() #* Aqui hay q ver si es una clase luego
+                di[i] = self.addrs[i].copy().__dict__() #* Aqui hay q ver si es una clase luego
             else:
                 di[i] = self.addrs[i]
         return di

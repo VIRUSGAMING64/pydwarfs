@@ -15,6 +15,7 @@ class Interpreter:
     memory: Memory = None
 
     def __dict__(self):
+      
         di = {
             "memory": self.memory.__dict__(),
             "line": self.line
@@ -73,10 +74,10 @@ class Interpreter:
 
         self.alloc("x", Token(0,NUMBER))
         self.alloc("y", Token(0,NUMBER))
-
         self.line = idx
         self.parser = Parser(self.memory)
-                
+
+
     def query(self, attr):
         return self.memory.query(attr)
 
@@ -108,7 +109,7 @@ class Interpreter:
                 err = str(f"Label {out} no encontrado")
                 raise Exception(err)
             return True
-        elif code == CONTINUE:
+        elif code & CONTINUE:
             self.line -= 1
         
         self.line+=1

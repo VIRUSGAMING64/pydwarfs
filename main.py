@@ -21,9 +21,8 @@ def TestServerCom():
     g.LoadTerrains()
     g.LoadMaps()
     g.LoadCreatures()
-    for i in range(200):
-        g.Step()
     wser = WebSockServer(g)
+    print("websockets starteds")
     asyncio.run(wser.RunWebsocks())
 
 
@@ -34,9 +33,6 @@ def InterTest():
     open("ast.json", "w").write(s)
     while iner.Step():
         pass
-
-    for i in iner.memory.addrs:
-        print(i,":",iner.memory.addrs[i].value)
 
 InterTest()
 #TestServerCom()

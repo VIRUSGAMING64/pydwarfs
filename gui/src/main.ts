@@ -1,44 +1,6 @@
 import Communication from "./com.js"
-class Drawler{
-    pix: number
-    ctx: CanvasRenderingContext2D
-    sizex: number
-    sizey: number
-    
-    constructor(ctx: CanvasRenderingContext2D, pixels: number, sizex: number,sizey: number){
-        this.pix = pixels
-        this.ctx = ctx
-        this.sizex = sizex
-        this.sizey = sizey
-    }
-    
-    FillMatrix(){
-        let color = "green"
-        for(let i = 0; i < this.sizex; i++){
-            for(let j = 0; j < this.sizey; j++){
-                this.Fill(i,j, color)
-            }   
-        }
-    }
-
-    Fill(px :number,py :number, color = "black", border = "red"){
-        px = px * this.pix
-        py = py * this.pix
-        this.ctx.beginPath()
-        this.ctx.rect(px, py, this.pix, this.pix)
-        this.ctx.strokeStyle = border
-        this.ctx.fillStyle = color
-        this.ctx.fillRect(px,py, this.pix, this.pix)
-        this.ctx.strokeRect(px,py, this.pix, this.pix)
-    }
-
-    SetPos(x :number,y :number, color = "black", border = "red") {
-        let px = Math.floor(x / this.pix) 
-        let py = Math.floor(y / this.pix)
-        this.Fill(px,py,color, border)
-    }
-
-}
+import Drawler from "./grid.js"
+import Game from "./game.js";
 
 let canvas = document.createElement("canvas");
 
@@ -52,42 +14,109 @@ canvas.height = Math.max(window.innerWidth, window.innerHeight);
 let ctx = canvas.getContext("2d");
 let com = new Communication("ws://127.0.0.1:9090");
 
+let BaseGame: Game|null=null
+let conf :Drawler|null = null
 
-if (ctx) {
-    setInterval(() => {
-        console.log(com.Send("SHOW"));
-        let data = com.Recive();
-        if (data.data == undefined) {
-            return;
+
+function RawData(){
+        console.log(com.Show());
+    let data = com.Recive();
+    if (data.data == undefined) {
+        return "";
+    }
+    return data.data
+}
+
+function GetCreatures(rawstr: string){
+    let obj = JSON.parse(rawstr)
+    return obj.creatures
+}
+
+function GetMaps(rawstr: string){
+    let obj = JSON.parse(rawstr);
+    return obj.maps
+}
+
+
+
+function RenderizeScreen(forse = false){
+    let creatures,data, mapa 
+    if (BaseGame == null || !BaseGame.paused || forse){ //* Aqui se hace fetch desde el server
+        data = RawData()
+        if (data == ""){
+            return
         }
-        let obj = JSON.parse(data.data);
-        let mapa = obj.maps[0].Grid;
-
+        mapa = GetMaps(data)[0].Grid
+        creatures = GetCreatures(data)
+    }
+        
+    if (conf == null){
         let sizex =  mapa[0].length
         let sizey =  mapa.length
         let len = Math.max(sizex,sizey);
         let pixsz = Math.max(window.innerWidth, window.innerHeight) / len;
-
         canvas.width = pixsz * sizex;
-        canvas.height = pixsz * sizey;
+        canvas.height = pixsz * sizey;    
+        conf = new Drawler(ctx, pixsz,sizex, sizey);
+    }
 
-        let conf = new Drawler(ctx, pixsz,sizex, sizey);
-        conf.FillMatrix();
-        canvas.addEventListener("mousedown", (ev) => {
-            let x = ev.offsetX;
-            let y = ev.offsetY;
-            console.log(x, y);
-            conf.SetPos(x, y, "blue");
-        });
-        for (var i = 0; i < mapa.length; i++) {
-            for (var j = 0; j < mapa[0].length; j++) {
-                if (mapa[i][j].Char == "#") {
-                    conf.Fill(j, i, "white");
-                }
-                else if (mapa[i][j].Char == "*") {
-                    conf.Fill(j, i, "blue");
-                }
-            }
-        }
-    }, 1000 / 5);
+    if (BaseGame == null){
+        BaseGame = new Game(conf)
+    }else{
+        BaseGame.grid = conf
+    }
+    if (BaseGame.paused && !forse){
+        console.log("juego pausado")
+        return
+    }
+    BaseGame.DrawGame(mapa, creatures)
 }
+
+setInterval(() => {
+    if(!BaseGame?.paused) {
+        BaseGame?.Step(com)
+        RenderizeScreen()
+    }
+}, 1000 / 60);
+
+
+
+
+
+
+
+
+
+
+
+function Continue(){
+    if (BaseGame == null){
+        return
+    }
+    BaseGame.Continue()
+}
+function Pause(){
+    if (BaseGame == null){
+        return
+    }
+    BaseGame.Pause()
+}
+function Step(){
+    if (BaseGame == null){
+        return
+    }
+    console.log("haciendo un step manual")
+    BaseGame.Step(com)
+    RenderizeScreen(true)
+}
+
+document.getElementById("btn-continue")?.addEventListener("click", Continue);
+document.getElementById("btn-pause")?.addEventListener("click", Pause);
+document.getElementById("btn-step")?.addEventListener("click", Step);
+const toggleBtn = document.getElementById('toggleBtn');
+const sidebar = document.getElementById('sidebar');
+
+// Añadir evento de clic al botón
+toggleBtn?.addEventListener('click', () => {
+    sidebar?.classList.toggle('collapsed');
+});
