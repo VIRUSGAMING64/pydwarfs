@@ -1,10 +1,5 @@
 from modules.interpreter.lexer import *
 from modules.interpreter.ast import *
-from modules.interpreter.parser.parser import *
-import logging
-
-
-logging.basicConfig(level=logging.DEBUG)
 
 def void():
     pass
@@ -24,12 +19,10 @@ class Interpreter:
         iner.faction = self.faction.copy()
         iner.health = self.health.copy()
         iner.lifespan = self.lifespan.copy()
-        iner.char = self.char.copy()
         iner.parser = Parser(iner.memory)
         return iner
 
     def __dict__(self):
-      
         di = {
             "memory": self.memory.__dict__(),
             "line": self.line
@@ -38,8 +31,7 @@ class Interpreter:
 
     def __init__(self, rawSrc="", filename = "__file__"):
         if rawSrc == "":
-            if filename == "__file__":
-                return 
+            if filename == "__file__": return 
             with open(filename,"rb") as f:
                 rawSrc = f.read()
 
@@ -52,8 +44,7 @@ class Interpreter:
             "vision", 
             "lifespan"
         ]
-        lexed = Lexer(rawSrc, errors)
-        logging.debug(errors["Errors"])
+        lexed = Lexer(rawSrc)
         self.ast = AstBuilder(lexed.TokenizeSource())
         self.ast.ExtractStructures(memory=self.memory)
         for GotosLabel in self.ast.gotoslabels:
@@ -80,10 +71,10 @@ class Interpreter:
             head = li.subtokens[0].name
             val = li.subtokens[1].value
             if not (head in attrs):
-                raise Exception("Invalid header")        
-            self.__setattr__(head, val)  
+                raise Exception("Invalid header")  
             value = Token(val)
-            value.GetType(operators, keywords)              
+            value.GetType(operators, keywords)           
+            self.__setattr__(head, value)           
             self.memory.alloc(head, value)
 
         #* Checking creatures attributes

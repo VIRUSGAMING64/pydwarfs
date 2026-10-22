@@ -52,7 +52,6 @@ class WebSockServer:
 
     def Action(self, RawData: str):
         try:
-            print(RawData)
             data = RawData.split("__DATA__")
             code = data[0]
             data = data[1]

@@ -1,13 +1,10 @@
-from modules.game.terrains import *
-from modules.game.objects import *
-from modules.game.map import *
+from modules.game.types.terrains import *
+from modules.game.types.objects import *
+from modules.game.types.map import *
 from modules.interpreter import *
-from modules.game.map import GameMap
+from modules.game.types.map import GameMap
 from modules.game.maths import *
-import logging
 import os
-
-logging.basicConfig(level=logging.DEBUG)
 
 DEFAULT_O_PATH = "gamedata/objets"
 DEFAULT_T_PATH = "gamedata/terrains"
@@ -44,7 +41,7 @@ class Game:
         try:
             data = os.listdir(self.t_path)
         except Exception as e:
-            logging.error(f"unable to load terrains [{e}]")
+            print(e)
             return
         for pth in data:
             if not pth.endswith(".te"):
@@ -61,7 +58,7 @@ class Game:
         try:
             data = os.listdir(self.o_path)
         except Exception as e:
-            logging.error(f"unable to load objects [{e}]")
+            print(f"unable to load objects [{e}]")
             return
         for pth in data:
             if not pth.endswith(".ob"):
@@ -77,7 +74,7 @@ class Game:
         try:
             data = os.listdir(self.m_path)
         except Exception as e:
-            logging.error(f"unable to load maps [{e}]")
+            print(f"unable to load maps [{e}]")
             return
         for pth in data:
             if not pth.endswith(".map"):

@@ -1,5 +1,5 @@
 
-from modules.game.initializer import *
+from modules.game.types.initializer import *
 
 class GameBaseMap:
     name = ""

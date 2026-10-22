@@ -1,5 +1,5 @@
 
-from modules.game.initializer import *
+from modules.game.types.initializer import *
 from modules.game.static import *
 from modules.game.typesutil import *
 

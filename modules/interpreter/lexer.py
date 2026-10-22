@@ -12,14 +12,12 @@ def cleanStr(s: str) -> str:
 
 class Lexer:
 
-    def __init__(self, code, output):
+    def __init__(self, code):
         code = code.replace("\t","  ")
         code = code.replace("\r","  ")
         code = code.split("\n")
         self.code = code
-        self.output = output
-        self.output["Errors"] = []
-
+        
     def Tokenize(self, expr: str) -> list[Token]:
         pos = 0
         act_tok = ""
