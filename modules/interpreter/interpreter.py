@@ -14,6 +14,20 @@ class Interpreter:
     line:int = 0
     memory: Memory = None
 
+    def copy(self):
+        iner = Interpreter()
+        iner.memory = self.memory.copy()
+        iner.line = self.line
+        iner.ast = self.ast.copy() 
+        iner.vision = self.vision.copy()
+        iner.creature = self.creature.copy()
+        iner.faction = self.faction.copy()
+        iner.health = self.health.copy()
+        iner.lifespan = self.lifespan.copy()
+        iner.char = self.char.copy()
+        iner.parser = Parser(iner.memory)
+        return iner
+
     def __dict__(self):
       
         di = {
@@ -24,6 +38,8 @@ class Interpreter:
 
     def __init__(self, rawSrc="", filename = "__file__"):
         if rawSrc == "":
+            if filename == "__file__":
+                return 
             with open(filename,"rb") as f:
                 rawSrc = f.read()
 

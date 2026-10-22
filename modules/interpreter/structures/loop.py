@@ -15,6 +15,15 @@ class Loop(Structure):
         self.expr = base.subtokens[1 : ]
         self.ip = 0
 
+    def copy(self):
+        lo = Loop.__new__(Loop)
+        lo.base_token = self.base_token.copy()
+        lo.type = LOOP
+        lo.ip = 0
+        lo.expr = [x.copy() for x in self.expr]
+        lo.name = self.name
+        lo.line = self.line
+
     def Execute(self, parser: Parser):  
             if self.ip == 0:
                 if not self.EvalCond(parser):

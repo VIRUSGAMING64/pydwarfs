@@ -22,14 +22,28 @@ export default class Game {
                 }
             }
         }
-        console.log(creatures);
         for (let i = 0; i < creatures.length; i++) {
             const cr = creatures[i];
             let x = cr.memory.x.value;
             let y = cr.memory.y.value;
-            console.log(x, y);
             this.grid.Fill(x, y, "black");
         }
+    }
+    AddEntity(com, name) {
+        const canvas = document.querySelector("canvas");
+        if (canvas == null) {
+            return;
+        }
+        canvas.addEventListener("click", (event) => {
+            const sz = this.grid?.pix;
+            if (sz == undefined) {
+                return;
+            }
+            const posx = Math.floor((event.offsetX) / sz);
+            const posy = Math.floor((event.offsetY) / sz);
+            com.AddEntity(name, posx, posy);
+            console.log("aqui: ", posx, posy);
+        }, { once: true });
     }
     Pause() {
         this.paused = true;

@@ -17,13 +17,13 @@ class Token:
         raise Exception("Token not executable")
         return NORMAL, None
     
-    def __init__(self,expr, type=None):
+    def __init__(self,expr, tp=None):
         self.data = {}
         self.value = expr
         self.name = expr
         self.subtokens = []
-        if type != None:
-            self.type = type
+        if tp != None:
+            self.type = tp
 
     def copy(self):
         new = Token(
@@ -107,6 +107,7 @@ class Token:
 
         if flag:
             self.type = STRING
+            self.value = self.value[1:-1]
 
         return self.type
 

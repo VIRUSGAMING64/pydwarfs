@@ -8,7 +8,7 @@ class CommunicationStatus:
     SHOW = 5
 
  */
-const SHOW = 5, STEP = 1;
+const SHOW = 5, ADD = 6, STEP = 1;
 export default class Communication {
     ws;
     queue;
@@ -25,11 +25,22 @@ export default class Communication {
     Closed() {
         console.log("closed");
     }
-    Show() {
-        return this.Send(String(SHOW));
+    Show(data = {}) {
+        data = JSON.stringify(data);
+        return this.Send(String(SHOW) + "__DATA__" + String(data));
     }
-    Step() {
-        return this.Send(String(STEP));
+    Step(data = {}) {
+        data = JSON.stringify(data);
+        return this.Send(String(STEP) + "__DATA__" + String(data));
+    }
+    AddEntity(name, x, y) {
+        let data = {
+            "name": name,
+            "x": x,
+            "y": y
+        };
+        let sdata = JSON.stringify(data);
+        this.Send(String(ADD) + "__DATA__" + sdata);
     }
     Send(data) {
         if (this.ws.OPEN != this.ws.readyState) {
@@ -45,13 +56,8 @@ export default class Communication {
         if (this.queue.length <= this.idx) {
             return false;
         }
-        let data = this.queue.at(this.idx);
-        this.idx += 1;
-        if (this.idx == 30) {
-            this.queue = this.queue.slice(this.idx);
-            this.idx = 0;
-            console.log("limpiado", this.queue.length);
-        }
+        let data = this.queue.at(this.queue.length - 1);
+        this.queue = new Array();
         return data;
     }
 }

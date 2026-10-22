@@ -5,7 +5,7 @@ class GameBaseMap:
     name = ""
     strings = []
 
-    def Initialize(self, buff): 
+    def Initialize(self, buff):
         buff = buff.decode().split("\n")
         if len(buff) == 0:
             return False
@@ -13,7 +13,6 @@ class GameBaseMap:
         self.strings = buff[1:]
         if len(self.strings) == 0:
             return False
-        
         baselen = len(self.strings[0])
         for line in self.strings:
             if len(line) != baselen:
@@ -47,9 +46,9 @@ class GameBaseMap:
             ma.append(mps)
 
         return GameMap(self.name, ma)
-        
-                    
-class GameMap: 
+
+
+class GameMap:
     Grid:list = []
     Name = ""
     def __init__(self, name, grid):
@@ -57,7 +56,7 @@ class GameMap:
         self.Name = name
 
     def __dict__(self):
-        grid = [] 
+        grid = []
         for line in self.Grid:
             tmp = []
             for k in line:

@@ -1,6 +1,8 @@
 import Communication from "./com.js";
 import Drawler from "./grid.js";
 import Game from "./game.js";
+import { GetCreatures, RawData, GetMaps, GetRunningCreatures } from "./utils.js";
+"./utils";
 let canvas = document.createElement("canvas");
 let elem = document.getElementById("draw");
 if (elem != null) {
@@ -12,28 +14,12 @@ let ctx = canvas.getContext("2d");
 let com = new Communication("ws://127.0.0.1:9090");
 let BaseGame = null;
 let conf = null;
-function RawData() {
-    com.Show();
-    let data = com.Recive();
-    if (data.data == undefined) {
-        return "";
-    }
-    return data.data;
-}
-function GetCreatures(rawstr) {
-    let obj = JSON.parse(rawstr);
-    return obj.creatures;
-}
-function GetMaps(rawstr) {
-    let obj = JSON.parse(rawstr);
-    return obj.maps;
-}
 function RenderizeScreen(forse = false) {
     let creatures, data, mapa;
     if (BaseGame == null || !BaseGame.paused || forse) { //* Aqui se hace fetch desde el server
-        data = RawData();
+        data = RawData(com);
         if (data == "") {
-            return;
+            return false;
         }
         mapa = GetMaps(data)[0].Grid;
         creatures = GetCreatures(data);
@@ -42,10 +28,15 @@ function RenderizeScreen(forse = false) {
             for (let i = 0; i < creatures.length; i += 1) {
                 let c = creatures[i];
                 let button = document.createElement("button");
-                button.innerText = c.memory.creature.name;
+                const name = c.memory.creature.name;
+                button.innerText = name;
                 button.className = "w-30 h-8 m-1 gap-1 text-white bg-gray-900";
+                button.onclick = () => {
+                    //Aqui quiero agregar un coso  
+                    const LocalName = name;
+                    BaseGame?.AddEntity(com, name);
+                };
                 menu?.appendChild(button);
-                console.log(c);
             }
         }
     }
@@ -65,20 +56,27 @@ function RenderizeScreen(forse = false) {
         BaseGame.grid = conf;
     }
     if (BaseGame.paused && !forse) {
-        return;
+        return false;
     }
+    creatures = GetRunningCreatures(data);
     BaseGame.DrawGame(mapa, creatures);
+    return true;
 }
 setInterval(() => {
     if (BaseGame == null) {
-        RenderizeScreen(true);
+        let val = RenderizeScreen(true);
+        while (val) {
+            val = RenderizeScreen(true);
+        }
     }
     else if (!BaseGame?.paused) {
-        console.log("cosa");
         BaseGame?.Step(com);
-        RenderizeScreen();
+        let val = RenderizeScreen();
+        while (val) {
+            val = RenderizeScreen();
+        }
     }
-}, 1000 / 60);
+}, 100 / 6);
 function Continue() {
     if (BaseGame == null) {
         return;
@@ -96,7 +94,10 @@ function Step() {
         return;
     }
     BaseGame.Step(com);
-    RenderizeScreen(true);
+    let val = RenderizeScreen(true);
+    while (val) {
+        val = RenderizeScreen(true);
+    }
 }
 document.getElementById("btn-continue")?.addEventListener("click", Continue);
 document.getElementById("btn-pause")?.addEventListener("click", Pause);

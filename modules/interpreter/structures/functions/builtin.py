@@ -1,7 +1,10 @@
 #TODO
 
 from modules.interpreter.statics import *
-#* Aqui van las functions del juego para parsear
+
+def RegisterTileProvider(provider):
+    global tile_provider
+    tile_provider = provider
 
 
 def move(memory, args):
@@ -18,6 +21,13 @@ def wait(memory ,args):
     num = args[0]
     if (num.type & NUMBER ) == 0:
         raise Exception("un error para sergio")
+
+def reproduce(memory, args):
+    dx = args[0]
+    dy = args[1]
+    dam= args[2]
+
+
 
 builtins = [
     "move",

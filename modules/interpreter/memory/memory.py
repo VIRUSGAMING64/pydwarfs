@@ -9,6 +9,18 @@ class Memory:
         self.addrs = data
         self.consts = {}
 
+    def copy(self):
+        mem = Memory()
+        mem.addrs = {}
+        
+        for key in self.addrs:
+            mem.addrs[key] = self.addrs[key].copy()
+
+        for key in self.consts:
+            mem.consts[key] = self.consts[key]
+
+        return mem
+
     def alloc_const(self, key, value):
         self.consts[key] = True
         self.addrs[key] = value.copy()

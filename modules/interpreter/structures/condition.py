@@ -48,8 +48,6 @@ class Condition(Structure):
         if self.ip == 0:
             if not self.EvalCond(parser):
                 return NORMAL,None
-        if len(self.subtokens) == self.ip:
-            input()
             
         expr = self.subtokens[self.ip]
         re = expr.Execute(parser)

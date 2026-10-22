@@ -13,6 +13,7 @@ class CommunicationStatus:
     CONTINUE = 3
     SIGKILL = 4
     SHOW = 5
+    ADD = 6
 
 class WebSockServer:
     websock = None 
@@ -32,21 +33,48 @@ class WebSockServer:
             out = self.Action(cli_data)
             await cli.send(out)
 
+    def AddEntity(self,obj):
+        obj: dict = json.loads(obj)
+        name=obj.get("name")
+        x = obj.get("x")
+        y=obj.get("y")
+        if None in [name, x, y]:
+            raise Exception("un error ahi para despues")
+            #! deuda tecnica
+
+        for tmp_c in self.game.Creatures:
+            c_name= tmp_c.memory.addrs.get("creature").name 
+            if c_name == name:
+                c = tmp_c.copy()
+                c.memory.addrs["x"].value = int(x)
+                c.memory.addrs["y"].value = int(y)
+                self.game.RunningCreatures.append(c)
+
     def Action(self, RawData: str):
         try:
-            if not RawData.isnumeric():
+            print(RawData)
+            data = RawData.split("__DATA__")
+            code = data[0]
+            data = data[1]
+            if not code.isnumeric():
                 return "invalid data" #* Aqui hay que hacer algo mejor para esto
-            code = int(RawData)
-            data = "" 
+            code = int(code)
+            result = "" 
             if code == CommunicationStatus.STEP:
                 self.game.Step()
             elif code == CommunicationStatus.SHOW:
-                data = self.game.__dict__()
-                data = json.dumps(data)
+                result = self.game.__dict__()
+                result = json.dumps(result)
             elif code == CommunicationStatus.SIGKILL:
-                data = "KILLED"
+                result = "KILLED"
                 self.game.kill()
-            return data
+            elif code == CommunicationStatus.ADD:
+                self.AddEntity(data)
+                result = self.game.__dict__()
+                result = json.dumps(result)
+        
+            return result
+        
         except Exception as e:
             print(e)
             exit(0)

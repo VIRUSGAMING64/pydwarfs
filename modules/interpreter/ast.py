@@ -1,8 +1,20 @@
 from modules.interpreter.structures import *
 from modules.interpreter.structures.functions.builtin import builtins
+
+
 class AstBuilder:
     Ast:list[Token|Loop|Condition] 
     labels:dict 
+
+    def copy(self):
+        a = AstBuilder(None)
+        a.labels = self.labels.copy()
+        a.prefuncs = self.prefuncs.copy()
+        a.builtin = self.builtin.copy()
+        a.gotoslabels = self.gotoslabels.copy()
+        a.Ast = [x.copy() for x in self.Ast]
+        a.funcs = [x.copy() for x in self.funcs]
+        return a
 
     def __init__(self, code: list[Token]):
         self.Ast = code

@@ -13,7 +13,7 @@ export default class Drawler{
     }
     
     FillMatrix(){
-        let color = "green"
+        let color = "#00ff00"
         for(let i = 0; i < this.sizex; i++){
             for(let j = 0; j < this.sizey; j++){
                 this.Fill(i,j, color)

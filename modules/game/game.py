@@ -23,6 +23,7 @@ class Game:
     Objects:list[GameObject] = None
     Maps:list[GameMap] = None
     Creatures :list[Interpreter] = None
+    RunningCreatures: list[Interpreter] = None
     
     def __init__(self, m_path = DEFAULT_M_PATH, t_path = DEFAULT_T_PATH, o_path = DEFAULT_O_PATH, c_path = DEFAULT_C_PATH):
         os.makedirs(m_path, exist_ok=True)
@@ -36,6 +37,7 @@ class Game:
         self.Objects = []
         self.Terrains = []
         self.Maps = []
+        self.RunningCreatures = []
         self.Creatures = []
 
     def LoadTerrains(self):
@@ -123,20 +125,24 @@ class Game:
         allys = 0
         enemis = 0
 
-        for cre in self.Creatures:
+        for cre in self.RunningCreatures:
             x=cre.query("x").value
             y=cre.query("y").value
             dis = p2dist(x,y,currx, curry)
-            if dis > c.vision:
+            if dis > c.vision.value:
                 continue
-            if cre.faction == c.faction:
+            if cre.faction.value == c.faction.value:
                 allys += 1
+                if dis == 0:
+                    continue
                 if dis < minAdis:
+                    minAdis = dis
                     allx = parsedirection(x,currx)
                     ally = parsedirection(y,curry)
             else:
                 enemis += 1 
                 if dis < minEdis:
+                    minEdis = dis
                     Ex = parsedirection(x,currx)
                     Ey = parsedirection(y,curry)
 
@@ -152,12 +158,14 @@ class Game:
         c.memory.alloc_const("enemy_dist", Token(minEdis, NUMBER))
         c.memory.alloc_const("ally_dist", Token(minAdis, NUMBER))
         c.memory.alloc_const("allies_near", Token(allys, NUMBER))
-        
-        
+        c.memory.alloc_const("enemies_near", Token(enemis, NUMBER))
+
     def Step(self):
-        for creature in self.Creatures:
+        p = False
+        for creature in self.RunningCreatures:
             self.GetPerseption(creature)
-            creature.Step()
+            p|=creature.Step()
+        return p
 
     def __dict__(self):
         return {
@@ -169,5 +177,6 @@ class Game:
             "objects": [ob.__dict__() for ob in self.Objects],
             "terrains": [te.__dict__() for te in self.Terrains],
             "maps": [ma.__dict__() for ma in self.Maps],
-            "creatures": [i.__dict__() for i in self.Creatures]
+            "creatures": [i.__dict__() for i in self.Creatures],
+            "runningCreatures": [i.__dict__() for i in self.RunningCreatures]
         }

@@ -30,12 +30,10 @@ def InterTest():
     di = iner.ast.__json__()
     s = json.dumps(di, indent="   ")
     open("ast.json", "w").write(s)
+    g = Game()
+    g.RunningCreatures.append(iner.copy())
     while 1:
-        Game.GetPerseption(Game(), iner)
-        p = iner.Step()
-        for i in iner.memory.addrs:
-            print(i, " allocated with value: ", iner.memory.query(i).value)
-        input("==================================================")
+        p = g.Step()
         if not p:
             break
 

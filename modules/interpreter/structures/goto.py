@@ -9,6 +9,15 @@ class Goto(Structure):
         self.name = "__GOTO__"
         self.label = label.name
 
+    def copy(self):
+        got = Goto.__new__(Goto)
+        got.subtokens = []
+        got.type = self.type
+        got.name = self.name
+        got.label = self.label
+        got.line = self.line
+        return got
+
     def __dict__(self):
         di = super().__dict__()
         di["label"] = self.label
