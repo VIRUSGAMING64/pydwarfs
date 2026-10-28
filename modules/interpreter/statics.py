@@ -75,6 +75,7 @@ operators += P0 + P1 + P2 + P3
 keywords = [
     "goto",
     "if",
+    "while",
     "func",
     "var",
     "for",

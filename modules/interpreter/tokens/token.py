@@ -153,7 +153,9 @@ class Parser:
         for lineidx, elem in enumerate(toks):
             assert elem is not None
             if elem.type & FUNCCALL:
-                elem = elem.Execute(self,self.memory)
+                code, elem = elem.Execute(self,self.memory)
+                if not (code & NORMAL):
+                    return code, None
                 assert elem is not None
                 toks[lineidx] = elem
 
@@ -182,6 +184,10 @@ class Parser:
                 unary = False
                 
             elif IsOperator(elem):
+                if elem.name == "!" and not unary:
+                    raise ExpresionException(
+                        f"Operator [{elem.value}] must be unary"
+                    )
                 if unary and is_unary(elem):
                     elem.data["neg"] = True
                 
@@ -228,7 +234,7 @@ class Parser:
             nums.append(res)
         except Exception as e:
             if isinstance(e, IndexError):
-                raise ExpresionException("Invalid expression")
+                raise SintaxisException("Invalid expression")
             if isinstance(e , ZeroDivisionError):
                 raise ZeroDivisionException('Zero division')
             raise e

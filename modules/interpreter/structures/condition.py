@@ -45,10 +45,14 @@ class Condition(Structure):
         return False
 
     def Execute(self, parser: Parser):  
+        
+        if len(self.subtokens) == 0:
+            return NORMAL, None
+        
         if self.ip == 0:
             if not self.EvalCond(parser):
                 return NORMAL,None
-            
+        
         expr = self.subtokens[self.ip]
         re = expr.Execute(parser)
         code, val = re[0], re[1]

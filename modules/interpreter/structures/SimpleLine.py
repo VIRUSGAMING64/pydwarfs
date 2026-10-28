@@ -41,6 +41,7 @@ class SingleLine(Structure):
             code = RETURNING
         
         opcode, val = parser.EvalExpr(self.subtokens)
-        
+        if val == None:
+            return code|opcode, None
         return code|opcode, val.copy()
     

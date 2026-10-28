@@ -32,7 +32,7 @@ class Interpreter:
     def __init__(self, rawSrc="", filename = "__file__"):
         if rawSrc == "":
             if filename == "__file__": return 
-            with open(filename,"rb") as f:
+            with open(filename, "r", encoding="utf-8") as f:
                 rawSrc = f.read()
 
         self.memory = Memory()
@@ -66,6 +66,8 @@ class Interpreter:
 
         for i in range(idx):
             li = self.ast.Ast[i]
+            if li.type & FUNCTION:
+                continue
             if len(li.subtokens) != 2:
                 raise Exception(f"Invalid header at line [{li.line}]")        
             head = li.subtokens[0].name
@@ -101,6 +103,11 @@ class Interpreter:
             return False
 
         ip = self.ast.Ast[self.line]
+        #*Aqui voy a ignorar las label
+        if ip.type & LABEL:
+            self.line += 1
+            return self.Step()
+            
         code, out = ip.Execute(self.parser)
         if code & FINDING:
             self.line = FindLabel(out,self.ast.Ast)

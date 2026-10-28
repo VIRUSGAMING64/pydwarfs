@@ -53,13 +53,15 @@ class FuncCall(Structure):
                 )
             #! Para debug
 
-            res = builtinfuncs[self.name](mem, args)
+            CODE, DATA = builtinfuncs[self.name](mem, args)
 
-            
-            if res == None:
+            res = DATA            
+            if DATA == None:
                 res = 0
 
-            return Token(res, NUMBER)
+            res = Token(res, NUMBER)
+
+            return CODE,res
         
         
         func = mem.query(self.name)
@@ -69,8 +71,7 @@ class FuncCall(Structure):
         
         if not (func.type & FUNCTION):
             raise MissingVariable(self.name)
-        args = []
-        
+
         if len(args) != len(func.args):
             raise CallFuncException(
                 f"Invalid number of arguments for [{self.name}]"
@@ -96,15 +97,16 @@ class FuncCall(Structure):
                 cl =  local_parser.EvalExpr(statement.subtokens[1:])[1].copy()
                 R = Token(cl.value)
                 R.GetType(operations,keywords)
-                return R
+                return NORMAL, R
             returned, value = statement.Execute(local_parser)
      
             if returned & RETURNING:
                 cl = Token(value.value)
                 cl.GetType(operations,keywords)
-                return cl
+                return NORMAL, cl
+            
             if returned & CONTINUE:
                 continue
 
             idx += 1 
-        return Token(0, NUMBER).copy()
+        return NORMAL, Token(0, NUMBER).copy()

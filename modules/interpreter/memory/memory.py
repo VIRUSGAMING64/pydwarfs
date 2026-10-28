@@ -1,13 +1,19 @@
 from modules.interpreter.exceptions import MemoryException
+import random
+
+ID = random.randint(10**8, 10**9)
 
 class Memory:
     addrs : dict
     consts: dict
-    def __init__(self, data = None):
+    def __init__(self, data:dict = None):
         if data == None:
             data = {}
         self.addrs = data
         self.consts = {}
+        global ID
+        self.id = ID
+        ID += 1
 
     def copy(self):
         mem = Memory()

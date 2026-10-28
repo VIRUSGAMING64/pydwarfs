@@ -6,6 +6,7 @@ import json
 import asyncio
 import sys
 
+
 def TestServerCom():
     path = "./src"
     ser = Server("127.0.0.1", 1200, path)
@@ -24,7 +25,6 @@ def TestServerCom():
     print("websockets starteds")
     asyncio.run(wser.RunWebsocks())
 
-
 def InterTest():
     iner = Interpreter(open("codigotest.txt","r").read())
     di = iner.ast.__json__()
@@ -32,10 +32,10 @@ def InterTest():
     open("ast.json", "w").write(s)
     g = Game()
     g.RunningCreatures.append(iner.copy())
-    while 1:
+    for i in range(10**6):
         p = g.Step()
         if not p:
             break
 
-#InterTest()
-TestServerCom()
+InterTest()
+#TestServerCom()

@@ -25,7 +25,7 @@ class Lexer:
         start_str = None
         in_str = False
         while pos <= len(expr):
-            if ((pos < len(expr)) and ((not expr[pos] in operators)) or in_str):
+            if pos < len(expr) and ((not expr[pos] in operators) or in_str):
                 act_tok += expr[pos]
 
                 if start_str == None and expr[pos] in ["\"", "\'"]:
@@ -68,6 +68,9 @@ class Lexer:
                 act_tok = ""
 
             pos += 1
+
+        if in_str:
+            raise SintaxisException("Unterminated string")
             
         line_tokens = []
 

@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from modules.interpreter.statics import *
+from modules.interpreter.exceptions import *
 
 if TYPE_CHECKING:
     from modules.interpreter.tokens.token import Token
@@ -55,9 +56,11 @@ def ValidFunctionStart(line : Token):
         return False
     if line.subtokens[0].name != "func":
             return False
+    sol=True
     if line.subtokens[2].name != "(":
-        return False
+        sol =  False
     if line.subtokens[-1].name != ")":
-        return False
-            
-    return True
+        sol = False
+    if sol == False:
+        raise SintaxisException("Invalid function declaration structure")
+    return sol
