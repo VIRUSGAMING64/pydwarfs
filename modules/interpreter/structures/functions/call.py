@@ -6,6 +6,8 @@ from modules.interpreter.exceptions import *
 from modules.interpreter.structures.structure import *
 from modules.interpreter.statics import *
 from modules.interpreter.structures.functions.builtin import *
+
+
 class FuncCall(Structure):
     args: list[Token]
     def __init__(self, name, args, line):
@@ -47,13 +49,13 @@ class FuncCall(Structure):
 
         if self.isbuiltin:
 
-            if len(args) != argslens[self.name]:
+            if len(args) != GenericBuiltinFunctions.argslens[self.name]:
                 raise CallFuncException(
                     f"Invalid number of arguments for [{self.name}]"
                 )
             #! Para debug
 
-            CODE, DATA = builtinfuncs[self.name](mem, args)
+            CODE, DATA = GenericBuiltinFunctions.builtinfuncs[self.name](mem, args)
 
             res = DATA            
             if DATA == None:

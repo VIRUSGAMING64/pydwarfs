@@ -7,16 +7,22 @@ from modules.interpreter.memory import *
 
 def getPrio(value):
     if value.data.get("neg", False):
-        return 3
-    op = value.name
-    if op in P0:
+        return 5
+    op = value.value
+    if op == "or":
         return 0
-    if op in P1:
+    if op == "and":
         return 1
-    if op in P2:
+    if op in ("==", "!=", "<", "<=", ">", ">=", "=>", "<=>"):
         return 2
-    if op in P3:
+    if op in ("+", "-"):
         return 3
+    if op in ("<<", ">>", "%", "*", "/"):
+        return 4
+    if op in ("**", "!"):
+        return 5
+    if op == "=":
+        return -1
     return -1
 
 def asign(a:"Token", b:"Token", mem: Memory):

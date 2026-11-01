@@ -12,7 +12,21 @@ DEFAULT_M_PATH = "gamedata/maps"
 DEFAULT_C_PATH = "gamedata/entity"
 GREATER = 2**64 - 1
 
-class Game:
+
+class Roar:
+    def __init__(self):
+        self.Roars = []
+    
+    def PostRoar(self,roar):
+        self.Roars.append(roar)
+
+    def PopLastRoar(self):
+            return self.Roars.pop()
+
+    def PopFirstRoar(self):
+            return self.Roars.pop(0)
+        
+class Game(Roar):
     m_path = DEFAULT_M_PATH
     t_path = DEFAULT_T_PATH
     o_path = DEFAULT_O_PATH
@@ -23,6 +37,7 @@ class Game:
     RunningCreatures: list[Interpreter] = None
     
     def __init__(self, m_path = DEFAULT_M_PATH, t_path = DEFAULT_T_PATH, o_path = DEFAULT_O_PATH, c_path = DEFAULT_C_PATH):
+        super().__init__()
         os.makedirs(m_path, exist_ok=True)
         os.makedirs(t_path, exist_ok=True)
         os.makedirs(o_path, exist_ok=True)
@@ -69,6 +84,7 @@ class Game:
                 base = GameObjectBuilder()
                 if base.Initialize(buff):
                     self.Objects.append(base.ToObject())
+                
 
     def LoadMaps(self):
         try:
@@ -86,6 +102,8 @@ class Game:
                 if base.Initialize(buff):
                     mapa = base.ToMap(self.Objects, self.Terrains)
                     if not isinstance(mapa, GameMap):
+                        print(mapa)
+                        raise Exception("error aqui")
                         #! reportar error del mapa
                         continue
                     self.Maps.append(mapa)
@@ -156,6 +174,16 @@ class Game:
         c.memory.alloc_const("ally_dist", Token(minAdis, NUMBER))
         c.memory.alloc_const("allies_near", Token(allys, NUMBER))
         c.memory.alloc_const("enemies_near", Token(enemis, NUMBER))
+
+    def GetEntityAt(self,x,y):
+        for it in self.RunningCreatures:
+            t_x = it.memory.query("x").value
+            t_y = it.memory.query("y").value
+            if t_x == x and t_y == y:
+                return it
+        
+    def GetObjectAt(self, x,y):
+        pass
 
     def Step(self):
         p = False

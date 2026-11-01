@@ -2,6 +2,9 @@ def Initialize(gametype, buff):
     buff = buff.decode()
     lines = buff.split("\n")
     for line in lines:
+        if line.startswith("#"):
+            continue
+                
         line = line.split(' ')
         if len(line) != 2:
             return False

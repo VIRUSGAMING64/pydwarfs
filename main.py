@@ -21,6 +21,7 @@ def TestServerCom():
     g.LoadTerrains()
     g.LoadMaps()
     g.LoadCreatures()
+    GenericBuiltinFunctions.game = g
     wser = WebSockServer(g)
     print("websockets starteds")
     asyncio.run(wser.RunWebsocks())
@@ -31,6 +32,7 @@ def InterTest():
     s = json.dumps(di, indent="   ")
     open("ast.json", "w").write(s)
     g = Game()
+    GenericBuiltinFunctions.game = g
     g.RunningCreatures.append(iner.copy())
     for i in range(10**6):
         p = g.Step()

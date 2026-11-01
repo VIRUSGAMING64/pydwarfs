@@ -39,6 +39,7 @@ class GameBaseMap:
             for elem in line:
                 tp = ops.get(elem)
                 if tp == None:
+                    print(elem)
                     return (i,j)
                 mps.append(tp.copy())
                 j += 1
