@@ -1,5 +1,7 @@
 from modules.interpreter.exceptions import MemoryException
+from modules.interpreter.tokens.gtoken import *
 import random
+import typing
 
 ID = random.randint(10**8, 10**9)
 
@@ -42,6 +44,8 @@ class Memory:
             self.addrs[key] = value.copy()
 
     def query(self, key):
+        if key == "random":
+            return Token(random.randint(0,99), NUMBER).copy()
         val = self.addrs.get(key, None)
         if val != None:
             return  val.copy()
@@ -55,3 +59,4 @@ class Memory:
             else:
                 di[i] = self.addrs[i]
         return di
+

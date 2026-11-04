@@ -1,5 +1,6 @@
 from modules.interpreter.lexer import *
 from modules.interpreter.ast import *
+from modules.interpreter.memory import *
 
 def void():
     pass
@@ -14,11 +15,7 @@ class Interpreter:
         iner.memory = self.memory.copy()
         iner.line = self.line
         iner.ast = self.ast.copy() 
-        iner.vision = self.vision.copy()
-        iner.creature = self.creature.copy()
-        iner.faction = self.faction.copy()
-        iner.health = self.health.copy()
-        iner.lifespan = self.lifespan.copy()
+             
         iner.parser = Parser(iner.memory)
         return iner
 
@@ -55,15 +52,10 @@ class Interpreter:
         if idx == -1:
             raise Exception("Entry point unknow")
 
-
-        #* Initializing attrubutes
-        for attr in attrs:
-            self.__setattr__(attr, None)
-
         #* En el pdf se dice q todo lo que esta antes de start:
         #* es un header por tanto no debe haber labels antes de start
         #* de todas formas start se busca usualmente
-
+        tmp_loadeds = []
         for i in range(idx):
             li = self.ast.Ast[i]
             if li.type & FUNCTION:
@@ -76,12 +68,11 @@ class Interpreter:
                 raise Exception("Invalid header")  
             value = Token(val)
             value.GetType(operators, keywords)           
-            self.__setattr__(head, value)           
             self.memory.alloc(head, value)
-
+            tmp_loadeds.append(head)
         #* Checking creatures attributes
         for attr in attrs:
-            if self.__getattribute__(attr)==None:
+            if not attr in tmp_loadeds:
                 raise Exception(f"Creature with missing attribute [{attr}] error at file: [{filename}]")
 
         self.memory.alloc_const("x", Token(0,NUMBER))
@@ -121,3 +112,14 @@ class Interpreter:
         
         self.line+=1
         return True
+
+
+    def ReduceHealth(self):
+        self.memory.alloc_const("health", Token(self.memory.query("health").value - 1, NUMBER))
+
+    def Vision(self):
+        return self.memory.query("vision")
+    def Faction(self):
+        return self.memory.query("faction")
+    def Health(self):
+        return self.memory.query("health")

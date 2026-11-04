@@ -1,4 +1,4 @@
-from modules.interpreter.tokens.token import Token
+from modules.interpreter.tokens.gtoken import Token
 from modules.interpreter.statics import *
 import modules.interpreter.tokens.tokens_utils as tk_utils
 from modules.interpreter.exceptions import *

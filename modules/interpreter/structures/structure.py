@@ -1,5 +1,7 @@
 
-from modules.interpreter.tokens.token import *
+from modules.interpreter.tokens.gtoken import *
+from modules.interpreter.parser.parserutils import *
+from modules.interpreter.statics import *
 
 def ToksCompression(tokens: list[Token]):
     s = ""

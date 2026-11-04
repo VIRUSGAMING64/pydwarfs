@@ -2,8 +2,6 @@
 from modules.interpreter.statics import *
 
 from modules.interpreter.tokens.tokens_utils import IsOperator, is_unary
-from modules.interpreter.tokens.token import *
-from modules.interpreter.memory import *
 
 def getPrio(value):
     if value.data.get("neg", False):
@@ -25,7 +23,7 @@ def getPrio(value):
         return -1
     return -1
 
-def asign(a:"Token", b:"Token", mem: Memory):
+def asign(a, b, mem):
     a.value = b.value
     mem.alloc(a.name, a)
    

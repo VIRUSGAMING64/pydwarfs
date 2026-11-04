@@ -39,5 +39,5 @@ def InterTest():
         if not p:
             break
 
-InterTest()
-#TestServerCom()
+#InterTest()
+TestServerCom()

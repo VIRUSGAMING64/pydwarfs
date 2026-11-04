@@ -50,3 +50,8 @@ class SintaxisException(InterpreterException):
     def __init__(self, error):
         super().__init__()
         self.error = error + " [__line__]"
+
+class FuncCallException(InterpreterException):
+    def __init__(self,error):
+        super().__init__()
+        self.error = error + " [__line__]"

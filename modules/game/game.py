@@ -144,9 +144,9 @@ class Game(Roar):
             x=cre.query("x").value
             y=cre.query("y").value
             dis = p2dist(x,y,currx, curry)
-            if dis > c.vision.value:
+            if dis > c.Vision().value:
                 continue
-            if cre.faction.value == c.faction.value:
+            if cre.Faction().value == c.Faction().value:
                 allys += 1
                 if dis == 0:
                     continue
@@ -187,9 +187,17 @@ class Game(Roar):
 
     def Step(self):
         p = False
-        for creature in self.RunningCreatures:
+        NCreatures = []
+        for creature in list(self.RunningCreatures):
             self.GetPerseption(creature)
             p|=creature.Step()
+            creature.ReduceHealth()
+            if creature.query("health").value > 0:
+                NCreatures.append(creature)
+            else:
+                del creature
+        self.RunningCreatures = NCreatures
+
         return p
 
     def __dict__(self):
