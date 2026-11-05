@@ -10,8 +10,8 @@ class Parser:
     def __init__(self,mem: Memory):
         self.memory = mem
 
-    def EvalExpr(self, toks:list[Token]):
-        toks = [x.copy() for x in toks]
+    def EvalExpr(self, tokens:list[Token]):
+        toks = [x.copy() for x in tokens]
         operations = []
         values = []
         unary = True
@@ -31,10 +31,20 @@ class Parser:
                 is_assignment = (
                     lineidx + 1 < len(toks) and toks[lineidx + 1].value == "="
                 )
+                expr = toks[lineidx+2 : ]
+                if len(expr) >= 1 and is_assignment:
+                    a_value = self.EvalExpr(expr)[1]
+                    elem.type |= a_value.type
+                    toks = toks[:lineidx+2] + [a_value]
+                    break
+
                 if value == None and not is_assignment:
                     raise MissingVariable(elem.name)
+
                 if value != None:
                     elem.value = value.value
+                    elem.type |= value.type
+
         for lineidx, elem in enumerate(toks):       
             if elem.name == "(":
                 operations.append(elem)
@@ -68,10 +78,10 @@ class Parser:
             else:
                 unary = False
                 values.append(elem)
-
    
         while len(operations) > 0:
             self.process(values,operations)
+
 
         if len(values) > 1 or len(operations)!=0:
             raise ExpresionException("Invalid expression")

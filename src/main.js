@@ -35,6 +35,7 @@ function RenderizeScreen(forse = false) {
                     //Aqui quiero agregar un coso  
                     const LocalName = name;
                     BaseGame?.AddEntity(com, name);
+                    RenderizeScreen(true);
                 };
                 menu?.appendChild(button);
             }
@@ -74,6 +75,12 @@ setInterval(() => {
         let val = RenderizeScreen();
         while (val) {
             val = RenderizeScreen();
+        }
+    }
+    else {
+        let val = RenderizeScreen(true);
+        while (val) {
+            val = RenderizeScreen(true);
         }
     }
 }, 100 / 6);

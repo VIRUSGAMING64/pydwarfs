@@ -3,6 +3,7 @@ from modules.game.types.objects import *
 from modules.game.types.map import *
 from modules.interpreter import *
 from modules.game.types.map import GameMap
+from modules.game.utils import *
 from modules.game.maths import *
 import os
 
@@ -125,6 +126,7 @@ class Game(Roar):
                     self.Creatures.append(base)
                 except Exception as e:
                     print(f"Error loading creature [{e}] in {pth}")
+                    raise e
 
     def GetPerseption(self, c: Interpreter):
         minAdis = GREATER #* no creo q vayan hacer un mapa tan grande
@@ -141,6 +143,8 @@ class Game(Roar):
         enemis = 0
 
         for cre in self.RunningCreatures:
+            if c.memory.id == cre.memory.id:
+                continue
             x=cre.query("x").value
             y=cre.query("y").value
             dis = p2dist(x,y,currx, curry)
@@ -182,22 +186,38 @@ class Game(Roar):
             if t_x == x and t_y == y:
                 return it
         
+    def IsInsideMap(self, x, y):
+        if not self.Maps:
+            return False
+        grid = self.Maps[0].Grid #TODO: support multiple maps
+        return 0 <= y < len(grid) and 0 <= x < len(grid[y])
+
     def GetObjectAt(self, x,y):
-        pass
+        if not self.IsInsideMap(x, y):
+            return None
+        element = self.Maps[0].Grid[y][x] #TODO: support multiple maps
+        if isinstance(element, GameObject):
+            return element
+        return None
+
+    def Clean(self):
+        NCreatures = []
+        for creature in self.RunningCreatures:
+            if creature.Health().value > 0:
+                NCreatures.append(creature)
+            else:
+                print("debug: MURIO UNA CRIATURA: ", creature.memory)
+                del creature
+            self.RunningCreatures = NCreatures
 
     def Step(self):
         p = False
-        NCreatures = []
-        for creature in list(self.RunningCreatures):
+        for idx in RandPermutation(0, len(self.RunningCreatures)-1, len(self.RunningCreatures), time.time_ns()):
+            creature = self.RunningCreatures[idx]
             self.GetPerseption(creature)
             p|=creature.Step()
             creature.ReduceHealth()
-            if creature.query("health").value > 0:
-                NCreatures.append(creature)
-            else:
-                del creature
-        self.RunningCreatures = NCreatures
-
+        self.Clean()
         return p
 
     def __dict__(self):

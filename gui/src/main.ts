@@ -22,7 +22,7 @@ let conf :Drawler|null = null
 function RenderizeScreen(forse = false){
     let creatures,data, mapa 
     if (BaseGame == null || !BaseGame.paused || forse){ //* Aqui se hace fetch desde el server
-        data = RawData(com)
+    data = RawData(com)
         if (data == ""){
             return false
         }
@@ -40,6 +40,7 @@ function RenderizeScreen(forse = false){
                     //Aqui quiero agregar un coso  
                     const LocalName = name
                     BaseGame?.AddEntity(com,name)
+                    RenderizeScreen(true)
                 }
                 menu?.appendChild(button)
             }
@@ -71,15 +72,20 @@ function RenderizeScreen(forse = false){
 
 setInterval(() => {
     if (BaseGame == null){
-        let val = RenderizeScreen(true)
-        while(val) {
-            val = RenderizeScreen(true)
-        }
+    let val = RenderizeScreen(true)
+    while(val) {
+        val = RenderizeScreen(true)
+    }
     }else if(!BaseGame?.paused) {
         BaseGame?.Step(com)
         let val = RenderizeScreen()
         while(val) {
             val = RenderizeScreen()
+        }
+    }else{
+        let val = RenderizeScreen(true)
+        while(val) {
+            val = RenderizeScreen(true)
         }
     }
 }, 100/6);

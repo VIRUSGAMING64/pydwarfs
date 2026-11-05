@@ -39,5 +39,8 @@ def InterTest():
         if not p:
             break
 
-#InterTest()
-TestServerCom()
+if "--web" in sys.argv:
+    TestServerCom()
+else:
+    InterTest()
+

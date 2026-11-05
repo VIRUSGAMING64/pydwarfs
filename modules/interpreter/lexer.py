@@ -25,6 +25,7 @@ class Lexer:
         start_str = None
         in_str = False
         while pos <= len(expr):
+
             if pos < len(expr) and ((not expr[pos] in operators) or in_str):
                 act_tok += expr[pos]
 
@@ -81,6 +82,7 @@ class Lexer:
                 for t in splited_tokens:
                     if t == []:
                         continue
+
                     line_tokens.append(t[0])        
             else:
                 line_tokens.append(line)      
@@ -121,8 +123,9 @@ class Lexer:
             lines.append(li)
         return lines
 
-    def ProcessRawLine(self, line: str, p):
+    def ProcessRawLine(self, line: str, p: int):
         line = line.strip()
+        line = line.split("#")[0]
         if line == "": 
             return None
         
@@ -130,12 +133,6 @@ class Lexer:
         t_line.line = p
         
         for j in range(len(t_line.subtokens)):
-            if t_line.subtokens[j].value == "#":
-                t_line.subtokens[j].type = COMMENT
-                t_line.subtokens[j].subtokens = t_line.subtokens[j+1:]
-                del t_line.subtokens[j+1:]
-                break
-
             t_line.subtokens[j].line = p
 
         for j in t_line.subtokens:

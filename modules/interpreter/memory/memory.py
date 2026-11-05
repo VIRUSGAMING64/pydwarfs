@@ -2,9 +2,7 @@ from modules.interpreter.exceptions import MemoryException
 from modules.interpreter.tokens.gtoken import *
 import random
 import typing
-
-ID = random.randint(10**8, 10**9)
-
+import uuid
 class Memory:
     addrs : dict
     consts: dict
@@ -13,10 +11,7 @@ class Memory:
             data = {}
         self.addrs = data
         self.consts = {}
-        global ID
-        self.id = ID
-        ID += 1
-
+        self.id = uuid.uuid4()
     def copy(self):
         mem = Memory()
         mem.addrs = {}
