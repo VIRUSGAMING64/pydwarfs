@@ -112,14 +112,18 @@ class Interpreter:
         
         self.line+=1
         return True
+        
+    def ReduceLifespan(self):
+        self.memory.alloc_const("lifespan", Token(self.memory.query("lifespan").value - 1, NUMBER))
 
-
-    def ReduceHealth(self):
-        self.memory.alloc_const("health", Token(self.memory.query("health").value - 1, NUMBER))
-
+    def Lifespan(self):
+        return self.memory.query("lifespan")
+    
     def Vision(self):
         return self.memory.query("vision")
+    
     def Faction(self):
         return self.memory.query("faction")
+    
     def Health(self):
         return self.memory.query("health")

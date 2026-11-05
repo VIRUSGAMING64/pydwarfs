@@ -12,7 +12,7 @@ class GameObjectBuilder:
         return Initialize(self, buff)
 
     def ToObject(self):
-        return GameObject(self.object, self.char, self.resource_max)
+        return GameObject(self.object, self.char, int( self.resource_max))
 
 
 class GameObject(GameJson):

@@ -12,7 +12,6 @@ def Initialize(gametype, buff):
         val = line[1]
         if not hasattr(gametype, attr):
             return False
-
         setattr(gametype, attr, val)
 
     return True

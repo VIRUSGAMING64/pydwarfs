@@ -9,7 +9,9 @@ builtins = [
     "wait",
     "reproduce",
     "kill",
-    "see"
+    "see",
+    "attack",
+    "consume"
 ]
 
 class Builtins:
@@ -23,7 +25,9 @@ class Builtins:
             "wait": self.wait,
             "kill": self.kill,
             "reproduce": self.reproduce,
-            "see": self.see
+            "consume": self.consume,
+            "see": self.see,
+            "attack": self.attack
         }
 
         self.argslens = {
@@ -32,9 +36,61 @@ class Builtins:
             "wait": 1,
             "reproduce": 3,
             "kill": 0,
-            "see": 2
+            "consume": 4,
+            "see": 2,
+            "attack": 3
         }
         self.game = game
+
+    def consume(self, memory, args):
+        dx = args[0].value
+        dy = args[1].value
+        attack = args[2].value
+        heal = args[3].value
+        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
+            (dx == 0 and dy == 0) or attack <= 0):
+            raise FuncCallException("attack direction must be between -1 and 1")
+        
+        for op in args:
+            if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
+                raise FuncCallException("attack arguments must be numbers")
+
+        self.attack(memory, args[:3])
+        h = memory.query("health")
+        h.value += heal
+        memory.alloc_const("health", h)
+        return NORMAL, None
+
+    def attack(self, memory, args):
+        dx = args[0].value
+        dy = args[1].value
+        attack = args[2].value
+        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
+            (dx == 0 and dy == 0) or attack <= 0):
+            raise FuncCallException("attack direction must be between -1 and 1")
+        for op in args:
+            if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
+                raise FuncCallException("attack arguments must be numbers")
+
+        xpos = memory.query("x")
+        ypos = memory.query("y")
+        target_x = xpos.value + dx
+        target_y = ypos.value + dy
+        entity = self.game.GetEntityAt(target_x, target_y)
+        if entity is not None:
+            health = entity.memory.query("health")
+            health.value -= attack
+            if health.value <= 0:
+                self.game.Clean()
+        else:
+            obj = self.game.GetObjectAt(target_x, target_y)
+            if obj is not None:
+                obj.Count -= attack
+                if obj.Count <= 0:
+                    self.game.Maps[0].Grid[target_y][target_x] = self.game.GetTerrainAt(target_x, target_y)
+
+        return NORMAL, None
+        
 
     def kill(self, memory, args):
         v=memory.query("health").copy()
@@ -49,6 +105,9 @@ class Builtins:
         if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
             (dx == 0 and dy == 0) or speed <= 0):
             raise FuncCallException("move direction must be between -1 and 1")
+        for op in args:
+            if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
+                raise FuncCallException("move arguments must be numbers")
 
         for _ in range(speed):
             xpos = memory.query("x") 

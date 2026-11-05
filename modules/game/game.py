@@ -203,7 +203,7 @@ class Game(Roar):
     def Clean(self):
         NCreatures = []
         for creature in self.RunningCreatures:
-            if creature.Health().value > 0:
+            if creature.Health().value > 0 and creature.Lifespan().value > 0:
                 NCreatures.append(creature)
             else:
                 print("debug: MURIO UNA CRIATURA: ", creature.memory)
@@ -216,10 +216,18 @@ class Game(Roar):
             creature = self.RunningCreatures[idx]
             self.GetPerseption(creature)
             p|=creature.Step()
-            creature.ReduceHealth()
+            creature.ReduceLifespan()
         self.Clean()
         return p
 
+    def GetTerrainAt(self, x,y):
+        if not self.IsInsideMap(x, y):
+            return None
+        element = self.Maps[0].Grid[y][x] #TODO: support multiple maps
+        if isinstance(element, GameTerrain):
+            return element
+        return self.Terrains[0].copy()
+    
     def __dict__(self):
         return {
             "paths": {
