@@ -45,7 +45,7 @@ class AstBuilder:
                 if opens == 1:    
                     args.append(arg)
                     if len(arg) == 0:
-                        raise CallFuncException("Invalid argument")
+                        raise FuncCallException("Invalid argument")
                     arg = []
                 else:
                     arg.append(tokens[j])
@@ -61,7 +61,7 @@ class AstBuilder:
                     args.append(arg)
                 return j,args
         
-        raise CallFuncException("Not closed function call !!")#* La cantidad de "(" > ")" entonces faltan ) para algunos ( 
+        raise FuncCallException("Not closed function call !!")#* La cantidad de "(" > ")" entonces faltan ) para algunos ( 
     
 
     def extract_funcs_call(self,tokens, mem:Memory):
@@ -202,5 +202,7 @@ def FindLabel(label, lines)-> int:
             pos = FindLabel(label, elem.subtokens)
             if pos != -1:
                 elem.ip = pos
+                elem.forced = True
+                print(elem.type == CONDITION)
                 return i
     return -1

@@ -23,15 +23,20 @@ class Loop(Structure):
         lo.expr = [x.copy() for x in self.expr]
         lo.name = self.name
         lo.line = self.line
+        lo.forced = self.forced
         lo.subtokens = [x.copy() for x in self.subtokens]
         return lo
 
-    def Execute(self, parser: Parser):  
+    def Execute(self, parser):  
             if len(self.subtokens) == 0:
                 return CONTINUE,None #* Si cambio CONTINUE por NORMAL, se evitan los bucles infinitos
-            if self.ip == 0:
+            if self.ip == 0 and not self.forced:
                 if not self.EvalCond(parser):
                     return NORMAL,None
+                
+            if self.forced == True:
+                self.forced = False
+    
             expr=self.subtokens[self.ip]
             code, val = expr.Execute(parser)        
             if code != NORMAL:

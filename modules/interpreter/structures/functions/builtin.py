@@ -47,6 +47,12 @@ class Builtins:
         dy = args[1].value
         attack = args[2].value
         heal = args[3].value
+        for argument in args:
+            if not (argument.type & NUMBER):
+                raise FuncCallException("consume arguments must be numbers")
+            
+        if attack <= 0 or heal <= 0:
+            raise FuncCallException("Attack and health most be greater than 0")
         if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
             (dx == 0 and dy == 0) or attack <= 0):
             raise FuncCallException("attack direction must be between -1 and 1")
@@ -65,12 +71,19 @@ class Builtins:
         dx = args[0].value
         dy = args[1].value
         attack = args[2].value
+        for argument in args:
+            if not (argument.type & NUMBER):
+                raise FuncCallException("consume arguments must be numbers")
+               
+        if attack <= 0:
+            raise FuncCallException("Attack argument most be greater than 0")
+
         if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
             (dx == 0 and dy == 0) or attack <= 0):
             raise FuncCallException("attack direction must be between -1 and 1")
         for op in args:
             if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
-                raise FuncCallException("attack arguments must be numbers")
+                raise FuncCallException("attack argument must be numbers")
 
         xpos = memory.query("x")
         ypos = memory.query("y")
@@ -82,6 +95,7 @@ class Builtins:
             health.value -= attack
             if health.value <= 0:
                 self.game.Clean()
+            entity.memory.alloc_const("health", health)
         else:
             obj = self.game.GetObjectAt(target_x, target_y)
             if obj is not None:
@@ -102,6 +116,13 @@ class Builtins:
         dx = args[0].value
         dy = args[1].value
         speed = args[2].value
+        for argument in args:
+            if not (argument.type & NUMBER):
+                raise FuncCallException("consume arguments must be numbers")
+                
+        if speed <= 0:
+            raise FuncCallException("Attack argument most be greater than 0")
+
         if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
             (dx == 0 and dy == 0) or speed <= 0):
             raise FuncCallException("move direction must be between -1 and 1")
@@ -145,6 +166,9 @@ class Builtins:
         current_y = memory.query("y").value
         vision = memory.query("vision").value
 
+        if vision <= 0:
+            raise FuncCallException("vision argument most be greater than 0")
+
         distance = max(abs(target_x - current_x), abs(target_y - current_y))
         if distance > vision:
             return NORMAL, memory.query("NONE").value
@@ -167,7 +191,13 @@ class Builtins:
 
     def wait(self,memory ,args):
         num = args[0]
-
+        for argument in args:
+            if not (argument.type & NUMBER):
+                raise FuncCallException("consume arguments must be numbers")
+        
+        if num.value <= 0:
+            raise FuncCallException("num argument most be greater than 0")
+        
         if not OnlyBitmask(num.type , [NUMBER,VARIABLE] ):
             raise FuncCallException("Wait arguments must be numbers")
                     
@@ -182,11 +212,18 @@ class Builtins:
 
     def reproduce(self,memory, args):
         #! Aqui hay un bug y es que las cosas no pueden estar en el setattr
+        for argument in args:
+            if not (argument.type & NUMBER):
+                raise FuncCallException("consume arguments must be numbers")
+        
         for num in args:
             if not OnlyBitmask(num.type , [NUMBER,VARIABLE] ):
                 raise FuncCallException("reproduce arguments must be numbers")
 
         dx, dy, health = [arg.value for arg in args]
+        if health <= 0:
+            raise FuncCallException("num argument most be greater than 0")
+                
         if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
             (dx == 0 and dy == 0) or health <= 0):
             raise FuncCallException("reproduce direction must be between -1 and 1")

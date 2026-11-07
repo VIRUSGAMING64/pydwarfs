@@ -6,7 +6,7 @@ from modules.interpreter.exceptions import *
 from modules.interpreter.structures.structure import *
 from modules.interpreter.statics import *
 from modules.interpreter.structures.functions.builtin import *
-
+from modules.interpreter.memory.memory import Memory
 
 class FuncCall(Structure):
     args: list[Token]
@@ -50,7 +50,7 @@ class FuncCall(Structure):
         if self.isbuiltin:
 
             if len(args) != GenericBuiltinFunctions.argslens[self.name]:
-                raise CallFuncException(
+                raise FuncCallException(
                     f"Invalid number of arguments for [{self.name}]"
                 )
         
@@ -74,7 +74,7 @@ class FuncCall(Structure):
             raise MissingVariable(self.name)
 
         if len(args) != len(func.args):
-            raise CallFuncException(
+            raise FuncCallException(
                 f"Invalid number of arguments for [{self.name}]"
             )
 

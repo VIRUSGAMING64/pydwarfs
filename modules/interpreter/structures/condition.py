@@ -34,6 +34,7 @@ class Condition(Structure):
         cond.expr = self.expr
         cond.name = self.name
         cond.type = self.type
+        cond.forced = self.forced
         cond.subtokens = [x.copy() for x in self.subtokens]
         return cond
 
@@ -50,16 +51,20 @@ class Condition(Structure):
         if len(self.subtokens) == 0:
             return NORMAL, None
         
-        if self.ip == 0:
-            if not self.EvalCond(parser):
+        if self.ip == 0 and not self.forced:
+            tvalue = self.EvalCond(parser)
+            if not tvalue:
                 return NORMAL,None
-        
+            
+        if self.forced == True:
+            self.forced = False
+
         expr = self.subtokens[self.ip]
         re = expr.Execute(parser)
         code, val = re[0], re[1]
-        if code != NORMAL:
-            self.ip=0
-            return code,val
+        if code & FINDING:
+            self.ip = 0
+            return code, val
         
         self.ip += 1
         self.ip %= len(self.subtokens)

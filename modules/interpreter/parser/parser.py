@@ -68,8 +68,9 @@ class Parser:
                     elem.data["neg"] = True
                 
                 while (len(operations)>0 and (
-                        ((getPrio(operations[-1]) >= getPrio(elem)) and (elem.data.get("neg",False) >= 0)) or
-                        (elem.data.get("neg",False) < 0 and ((getPrio(operations[-1])) >= getPrio(elem)))
+                        ((getPrio(operations[-1]) > getPrio(elem)) and (elem.data.get("neg",False) >= 0)) or
+                        (elem.data.get("neg",False) < 0 and ((getPrio(operations[-1])) >= getPrio(elem))) or
+                        (getPrio(operations[-1]) == getPrio(elem) and elem.value != "**")
                     )):
                     self.process(values, operations)
 
@@ -83,7 +84,7 @@ class Parser:
             self.process(values,operations)
 
 
-        if len(values) > 1 or len(operations)!=0:
+        if len(values) < 1 or len(values) > 1 or len(operations)!=0:
             raise ExpresionException("Invalid expression")
             
         return NORMAL,values[0]
@@ -109,6 +110,8 @@ class Parser:
             res.GetType(operators, keywords)
             nums.append(res)
         except Exception as e:
+            if isinstance(e, KeyError):
+                raise ExpresionException(f"Invalid operator [{opp.value}]")
             if isinstance(e, IndexError):
                 raise SintaxisException("Invalid expression")
             if isinstance(e , ZeroDivisionError):

@@ -67,8 +67,18 @@ class Interpreter:
             if not (head in attrs):
                 raise Exception("Invalid header")  
             value = Token(val)
-            value.GetType(operators, keywords)           
-            self.memory.alloc(head, value)
+            value.GetType(operators, keywords)     
+            if head in ["health","vision","lifespan"]:
+                if value.type != NUMBER :
+                    raise SintaxisException(f"Invalid value for attribute [{head}] at line [{li.line}]")
+                if value.value <= 0:
+                    raise SintaxisException(f"Invalid value for attribute [{head}] at line [{li.line}] most be greater than 0")
+
+            if head == "creature":
+                self.memory.alloc_const("species", value)
+                            
+            self.memory.alloc_const(head, value)
+            
             tmp_loadeds.append(head)
         #* Checking creatures attributes
         for attr in attrs:
@@ -82,6 +92,7 @@ class Interpreter:
         self.memory.alloc_const("OBJECT", Token(1,NUMBER))
         self.memory.alloc_const("ALLY", Token(2,NUMBER))
         self.memory.alloc_const("ENEMY", Token(3,NUMBER))
+        self.memory.alloc_const("age", Token(0, NUMBER))
         self.line = idx
         self.parser = Parser(self.memory)
 
@@ -92,7 +103,6 @@ class Interpreter:
     def Step(self):
         if self.line >= len(self.ast.Ast):
             return False
-
         ip = self.ast.Ast[self.line]
         #*Aqui voy a ignorar las label
         if ip.type & LABEL:
@@ -111,11 +121,21 @@ class Interpreter:
             self.line -= 1
         
         self.line+=1
-        return True
         
+        return True
+
+    
     def ReduceLifespan(self):
         self.memory.alloc_const("lifespan", Token(self.memory.query("lifespan").value - 1, NUMBER))
 
+    def IncrementAge(self):
+        a = self.Age()
+        a.value += 1
+        self.memory.alloc_const("age", a) 
+
+    def Age(self):
+        return self.memory.query("age")
+        
     def Lifespan(self):
         return self.memory.query("lifespan")
     

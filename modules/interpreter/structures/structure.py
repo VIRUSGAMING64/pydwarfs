@@ -16,6 +16,7 @@ def ToksCompression(tokens: list[Token]):
 
 class Structure(Token):
     expr:list[Token] =  None
+    forced = False
 
     def __init__(self, lines , parent = None):
         super().__init__(ToksCompression(lines).value)

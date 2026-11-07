@@ -17,7 +17,7 @@ class Lexer:
         code = code.replace("\r","  ")
         code = code.split("\n")
         self.code = code
-        
+
     def Tokenize(self, expr: str) -> list[Token]:
         pos = 0
         act_tok = ""
@@ -25,28 +25,28 @@ class Lexer:
         start_str = None
         in_str = False
         while pos <= len(expr):
-
+           
             if pos < len(expr) and ((not expr[pos] in operators) or in_str):
                 act_tok += expr[pos]
 
                 if start_str == None and expr[pos] in ["\"", "\'"]:
                     in_str = not in_str
                     start_str = expr[pos]
-                
+
                 elif expr[pos] == start_str:
                     in_str = not in_str
                     start_str = None
 
             else:
-                dis = -1        
+                dis = -1
                 act_tok = cleanStr(act_tok)
                 tokens.append(
                     Token(act_tok)
                   )
 
-                if pos < len(expr):            
+                if pos < len(expr):
                     dis -= 1
-                
+
                 p = False
                 if act_tok == "":
                     tokens.pop()
@@ -57,11 +57,11 @@ class Lexer:
                     while pos + 1 != len(expr) and expr[pos] + expr[pos + 1] in operators:
                         tokens[len(tokens) - 1].value += expr[pos + 1]
                         pos += 1
-            
-                if p: 
+
+                if p:
                     pos += 1
                     continue
-                
+
                 t_token:Token = tokens[len(tokens) + dis]
                 le = len(t_token.value)
                 t_token.GetType(operators, keywords)
@@ -72,7 +72,7 @@ class Lexer:
 
         if in_str:
             raise SintaxisException("Unterminated string")
-            
+
         line_tokens = []
 
         for i in range(len(tokens)):
@@ -83,15 +83,15 @@ class Lexer:
                     if t == []:
                         continue
 
-                    line_tokens.append(t[0])        
+                    line_tokens.append(t[0])
             else:
-                line_tokens.append(line)      
+                line_tokens.append(line)
         for t in line_tokens:
             if t.type == NIL:
-                raise SintaxisException(f"Sintax error with token [{t.value}]")           
+                raise SintaxisException(f"Sintax error with token [{t.value}]")
 
         return line_tokens
-        
+
     def getErrs(self,  expr):
         expr = expr.split(' ')
         if len(expr) == 1:
@@ -125,13 +125,16 @@ class Lexer:
 
     def ProcessRawLine(self, line: str, p: int):
         line = line.strip()
-        line = line.split("#")[0]
-        if line == "": 
+        if line == "":
             return None
-        
+
         t_line = self.str2Token(line)
         t_line.line = p
-        
+
+        for i,litoks in enumerate(t_line.subtokens):
+            if litoks.value == "#":
+                del t_line.subtokens[i : ]
+
         for j in range(len(t_line.subtokens)):
             t_line.subtokens[j].line = p
 
@@ -139,4 +142,8 @@ class Lexer:
             #TODO check if is hex
             if j.type == NIL:
                 self.output["Errors"].append(f"invalid token at line: {p}")
+
+        if len(t_line.subtokens) < 1:
+            return None
+
         return t_line

@@ -2,7 +2,9 @@ from modules.game import *
 from modules.interpreter import *
 from gui.server.server import *
 from threading import Thread
+from tests.helpers import *
 import json
+import pytest
 import asyncio
 import sys
 
@@ -38,6 +40,9 @@ def InterTest():
         p = g.Step()
         if not p:
             break
+import tests.test_known_bugs as err
+
+
 
 if "--web" in sys.argv:
     TestServerCom()

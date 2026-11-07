@@ -1,6 +1,6 @@
 
 from modules.interpreter.statics import *
-
+from modules.interpreter.exceptions import *
 from modules.interpreter.tokens.tokens_utils import IsOperator, is_unary
 
 def getPrio(value):
@@ -39,7 +39,7 @@ operations = {
     "<<":lambda a,b: a.value << b.value,
     ">>":lambda a,b: a.value >> b.value,
     "**":lambda a,b: a.value ** b.value,
-    "!":lambda a:  not a.value,
+    "not":lambda a:  not a.value,
     "or":lambda a, b: a.value | b.value,
     "xor":lambda a, b: a.value ^ b.value,
     "and":lambda a, b: a.value & b.value,
@@ -70,11 +70,13 @@ def plus(a):
 una = {
     "-": neg,
     "+": plus,
-    "!": _not
+    "not": _not
 }
 
 
 def process_op(b,a,op, mem):
     if op.value == "=":
         return operations[op.value](a,b,mem)
+    if a.type == STRING and b.type == STRING and op.value not in ("==", "!="):
+        raise ExpresionException(f"Invalid operation [{op.value}] with strings")
     return operations[op.value](a,b)
