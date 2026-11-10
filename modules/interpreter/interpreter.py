@@ -15,6 +15,7 @@ class Interpreter:
         iner.memory = self.memory.copy()
         iner.line = self.line
         iner.ast = self.ast.copy() 
+        iner.start_pos = self.start_pos
              
         iner.parser = Parser(iner.memory)
         return iner
@@ -22,7 +23,9 @@ class Interpreter:
     def __dict__(self):
         di = {
             "memory": self.memory.__dict__(),
-            "line": self.line
+            "line": self.line,
+            "start_pos": self.start_pos,
+            "ast": self.ast.__dict__()
         }
         return di
 
@@ -31,7 +34,7 @@ class Interpreter:
             if filename == "__file__": return 
             with open(filename, "r", encoding="utf-8") as f:
                 rawSrc = f.read()
-
+        self.start_pos = -1
         self.memory = Memory()
         errors = {}
         attrs = [
@@ -48,7 +51,8 @@ class Interpreter:
             if FindLabel(GotosLabel, self.ast.Ast) == -1:
                 raise Exception("Semantic exceptions, label unknow")
 
-        idx = FindLabel("start", self.ast.Ast)
+        self.start_pos = FindLabel("start", self.ast.Ast)
+        idx = self.start_pos
         if idx == -1:
             raise Exception("Entry point unknow")
 
@@ -57,7 +61,12 @@ class Interpreter:
         #* de todas formas start se busca usualmente
         tmp_loadeds = []
         for i in range(idx):
+            
             li = self.ast.Ast[i]
+            if (i == 0 and li.subtokens[0].value != "creature"
+                    and any(item.subtokens[0].value == "creature" for item in self.ast.Ast[:idx])):
+                raise SintaxisException("First non empty line must be creature $NAME")
+            
             if li.type & FUNCTION:
                 continue
             if len(li.subtokens) != 2:
@@ -82,8 +91,12 @@ class Interpreter:
             tmp_loadeds.append(head)
         #* Checking creatures attributes
         for attr in attrs:
-            if not attr in tmp_loadeds:
-                raise Exception(f"Creature with missing attribute [{attr}] error at file: [{filename}]")
+            cnt = tmp_loadeds.count(attr)
+            if cnt == 0:
+                raise SintaxisException(f"Creature with missing attribute [{attr}] error at file: [{filename}]")
+
+            if cnt > 1:
+                raise SintaxisException(f"Creature with duplicated attribute [{attr}] error at file: [{filename}]")
 
         self.memory.alloc_const("x", Token(0,NUMBER))
         self.memory.alloc_const("y", Token(0,NUMBER))
@@ -101,7 +114,15 @@ class Interpreter:
         return self.memory.query(attr)
 
     def Step(self):
+        try:
+            return self._Step()
+        except InterpreterException as e:
+            e.AddLine(self.line) 
+            #! Error porque tiene que coger la intruccion de su nodo mas abajo en el ast
+            raise e
+    def _Step(self):
         if self.line >= len(self.ast.Ast):
+            self.line = self.start_pos
             return False
         ip = self.ast.Ast[self.line]
         #*Aqui voy a ignorar las label

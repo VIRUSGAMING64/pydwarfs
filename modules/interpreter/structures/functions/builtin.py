@@ -1,4 +1,5 @@
 from modules.interpreter.statics import *
+from modules.interpreter.tokens.gtoken import Token
 import uuid
 from modules.interpreter.exceptions import *
 from modules.interpreter.utils import OnlyBitmask
@@ -8,6 +9,7 @@ builtins = [
     "say",
     "wait",
     "reproduce",
+    "roar",
     "kill",
     "see",
     "attack",
@@ -27,7 +29,8 @@ class Builtins:
             "reproduce": self.reproduce,
             "consume": self.consume,
             "see": self.see,
-            "attack": self.attack
+            "attack": self.attack,
+            "roar": self.roar
         }
 
         self.argslens = {
@@ -38,7 +41,8 @@ class Builtins:
             "kill": 0,
             "consume": 4,
             "see": 2,
-            "attack": 3
+            "attack": 3,
+            "roar": 1
         }
         self.game = game
 
@@ -53,8 +57,7 @@ class Builtins:
             
         if attack <= 0 or heal <= 0:
             raise FuncCallException("Attack and health most be greater than 0")
-        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
-            (dx == 0 and dy == 0) or attack <= 0):
+        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or attack <= 0):
             raise FuncCallException("attack direction must be between -1 and 1")
         
         for op in args:
@@ -78,8 +81,7 @@ class Builtins:
         if attack <= 0:
             raise FuncCallException("Attack argument most be greater than 0")
 
-        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
-            (dx == 0 and dy == 0) or attack <= 0):
+        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or attack <= 0):
             raise FuncCallException("attack direction must be between -1 and 1")
         for op in args:
             if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
@@ -89,12 +91,10 @@ class Builtins:
         ypos = memory.query("y")
         target_x = xpos.value + dx
         target_y = ypos.value + dy
-        entity = self.game.GetEntityAt(target_x, target_y)
+        entity = None if (dx == 0 and dy == 0) else self.game.GetEntityAt(target_x, target_y)
         if entity is not None:
             health = entity.memory.query("health")
             health.value -= attack
-            if health.value <= 0:
-                self.game.Clean()
             entity.memory.alloc_const("health", health)
         else:
             obj = self.game.GetObjectAt(target_x, target_y)
@@ -123,8 +123,8 @@ class Builtins:
         if speed <= 0:
             raise FuncCallException("Attack argument most be greater than 0")
 
-        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or
-            (dx == 0 and dy == 0) or speed <= 0):
+        if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or speed <= 0):
+            print(dx, dy, speed)
             raise FuncCallException("move direction must be between -1 and 1")
         for op in args:
             if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
@@ -135,6 +135,9 @@ class Builtins:
             xpos.value += dx
             ypos = memory.query("y") 
             ypos.value += dy
+            if (xpos.value < 0 or xpos.value >= self.game.Width or
+                ypos.value < 0 or ypos.value >= self.game.Height):
+                break
             obj = self.game.GetObjectAt(xpos.value, ypos.value)
             ent = self.game.GetEntityAt(xpos.value, ypos.value)
             if (obj == None) and (ent == None):
@@ -147,7 +150,14 @@ class Builtins:
 
 
     def roar(self, memory, args):
-        self.game.PostRoar(args[0])
+        x = memory.query("x")
+        y = memory.query("y")
+        tmp_roar = args[0]
+        if not (tmp_roar.type & STRING):
+            raise FuncCallException("Roar argument must be string")
+
+        self.game.PostRoar([tmp_roar, x, y])
+        return NORMAL, None
 
     def say(self,memory, args):
         cosa = args[0]
@@ -207,6 +217,7 @@ class Builtins:
         
 
         if self.WaitTempData[memory.id] == num.value:
+            self.WaitTempData[memory.id] = 0
             return NORMAL, None
         return CONTINUE, None
 
@@ -237,9 +248,16 @@ class Builtins:
         if parent == None:
             return NORMAL, None
 
+        if parent.Health().value <= health:
+            return NORMAL, None
+
         child_x = memory.query("x").value + dx
         child_y = memory.query("y").value + dy
-        if (self.game.GetObjectAt(child_x, child_y) is not None or
+        if not self.game.IsInsideMap(child_x,child_y):
+            return NORMAL, None
+
+        if (self.game.GetTerrainAt(child_x, child_y) is None or
+                self.game.GetObjectAt(child_x, child_y) is not None or
                 self.game.GetEntityAt(child_x, child_y) is not None):
             return NORMAL, None
 
@@ -248,19 +266,23 @@ class Builtins:
             index for index, instruction in enumerate(child.ast.Ast)
             if instruction.type & LABEL and instruction.name == "start"
         )
+        preserved = {
+            "creature", "species", "faction", "health", "vision", "lifespan",
+            "x", "y", "NONE", "GROUND", "OBJECT", "ALLY", "ENEMY", "age",
+        }
         for name, value in list(child.memory.addrs.items()):
-            if (name not in {"creature", "faction", "health", "vision", "lifespan"}
-                    and name not in child.memory.consts
-                    and not (value.type & FUNCTION)):
+            if name not in preserved and not (value.type & FUNCTION):
                 del child.memory.addrs[name]
+                child.memory.consts.pop(name, None)
 
-        child_x_token = child.memory.query("x")
-        child_x_token.value = child_x
-        child_y_token = child.memory.query("y")
-        child_y_token.value = child_y
+        child.memory.alloc_const("health", Token(health, NUMBER))
+        child.memory.alloc_const("age", Token(0, NUMBER))
+        child.memory.alloc_const("x", Token(child_x, NUMBER))
+        child.memory.alloc_const("y", Token(child_y, NUMBER))
         child.memory.id =  uuid.uuid4()
-        child.memory.alloc_const("x", child_x_token)
-        child.memory.alloc_const("y", child_y_token)
+        parent.memory.alloc_const(
+            "health", Token(parent.Health().value - health, NUMBER)
+        )
         self.game.RunningCreatures.append(child)
         return NORMAL, None
 

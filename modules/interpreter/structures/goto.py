@@ -16,6 +16,8 @@ class Goto(Structure):
         got.name = self.name
         got.label = self.label
         got.line = self.line
+        got.value = ""
+        got.data = {}
         return got
 
     def __dict__(self):

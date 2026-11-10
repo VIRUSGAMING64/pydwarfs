@@ -14,7 +14,7 @@ class FuncCall(Structure):
         if not isinstance(args, list):
             raise Exception("args not is a list")
         self.type = FUNCCALL
-        self.args = args
+        self.args = [x.copy() for x in args]
         self.name = name
         self.line = line
         self.subtokens = []
@@ -96,15 +96,11 @@ class FuncCall(Structure):
             statement = func.subtokens[idx]
             if statement.subtokens[0].value == "ret":
                 cl =  local_parser.EvalExpr(statement.subtokens[1:])[1].copy()
-                R = Token(cl.value)
-                R.GetType(operations,keywords)
-                return NORMAL, R
+                return NORMAL, cl
             returned, value = statement.Execute(local_parser)
      
             if returned & RETURNING:
-                cl = Token(value.value)
-                cl.GetType(operations,keywords)
-                return NORMAL, cl
+                return NORMAL, value.copy()
             
             if returned & CONTINUE:
                 continue

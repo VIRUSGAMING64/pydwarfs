@@ -35,6 +35,7 @@ class Memory:
                 raise MemoryException("Cannot eddit constants")
 
             self.addrs[key].value = value.value
+            self.addrs[key].type = value.type
         else:
             self.addrs[key] = value.copy()
 

@@ -42,8 +42,6 @@ def InterTest():
             break
 import tests.test_known_bugs as err
 
-
-
 if "--web" in sys.argv:
     TestServerCom()
 else:

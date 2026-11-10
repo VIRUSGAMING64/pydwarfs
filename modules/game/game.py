@@ -18,15 +18,9 @@ class Roar:
     def __init__(self):
         self.Roars = []
     
-    def PostRoar(self,roar):
-        self.Roars.append(roar)
+    def PostRoar(self,list_roar):
+        self.Roars.append(list_roar)
 
-    def PopLastRoar(self):
-            return self.Roars.pop()
-
-    def PopFirstRoar(self):
-            return self.Roars.pop(0)
-        
 class Game(Roar):
     m_path = DEFAULT_M_PATH
     t_path = DEFAULT_T_PATH
@@ -52,6 +46,8 @@ class Game(Roar):
         self.Maps = []
         self.RunningCreatures = []
         self.Creatures = []
+        self.Width = 0
+        self.Height = 0
 
     def LoadTerrains(self):
         try:
@@ -170,6 +166,18 @@ class Game(Roar):
         if minEdis == GREATER:
             minEdis = -1
 
+        roars_near = 0
+        last_roar = ""
+        for ro,rx,ry in self.Roars:
+            vx = rx.value
+            vy = ry.value
+            ris = p2dist(vx,vy, currx,curry)
+            if ris <= c.Vision().value:
+                roars_near += 1
+                last_roar = ro.copy().value
+ 
+        c.memory.alloc_const("last_roar", Token(last_roar, STRING))
+        c.memory.alloc_const("roars_near", Token(roars_near, NUMBER))
         c.memory.alloc_const("enemy_dx", Token(Ex, NUMBER))
         c.memory.alloc_const("enemy_dy", Token(Ey, NUMBER))
         c.memory.alloc_const("ally_dx", Token(allx, NUMBER))
@@ -178,6 +186,7 @@ class Game(Roar):
         c.memory.alloc_const("ally_dist", Token(minAdis, NUMBER))
         c.memory.alloc_const("allies_near", Token(allys, NUMBER))
         c.memory.alloc_const("enemies_near", Token(enemis, NUMBER))
+        self.Roars = []
 
     def GetEntityAt(self,x,y):
         for it in self.RunningCreatures:

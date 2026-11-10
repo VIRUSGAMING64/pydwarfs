@@ -88,6 +88,15 @@ class AstBuilder:
     def __json__(self):
         return [t.__dict__() for t in self.Ast]
 
+    def __dict__(self):
+        return {
+            "Ast": [t.__dict__() for t in self.Ast],
+            "labels": self.labels,
+            "prefuncs": self.prefuncs,
+            "builtin": self.builtin,
+            "gotoslabels": self.gotoslabels,
+            "funcs": [f.__dict__() for f in self.funcs]
+        }
 
     def ExtractStructures(self, start=0, toks = None, memory:Memory = None, infunc = False):
         
