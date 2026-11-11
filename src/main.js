@@ -21,7 +21,9 @@ function RenderizeScreen(forse = false) {
         if (data == "") {
             return false;
         }
-        mapa = GetMaps(data)[0].Grid;
+        const maps = GetMaps(data);
+        const selectedMap = JSON.parse(data).selectedMap;
+        mapa = (maps[selectedMap >= 0 ? selectedMap : 0] ?? maps[0]).Grid;
         creatures = GetCreatures(data);
         if (BaseGame == null) {
             const menu = document.getElementById("menu");

@@ -59,7 +59,10 @@ class WebSockServer:
         if name == None:
             raise Exception("un error ahi para despues")
             #! deuda tecnica
-        name = name.removeprefix("'").removesuffix("\"")
+        try:
+            name = json.loads(name)
+        except json.JSONDecodeError:
+            name = name.removeprefix("'").removesuffix("\"")
         for map in self.game.Maps:
 
             if map.Name == name:

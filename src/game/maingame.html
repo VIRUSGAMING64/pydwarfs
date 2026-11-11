@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es" class="bg-slate-950 text-slate-100">
 
 <head>
   <meta charset="UTF-8" />
@@ -7,30 +7,30 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="tailwind.js"></script>
   <link rel="stylesheet" href="style.css">
-  <title>pydwarf</title>
+  <title>Partida | Pydwarfs</title>
 </head>
 
-<body class="bg-red-950">
+<body class="h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,_#26343a,_#020617_42rem)] font-sans text-slate-100">
   <script type="module" src="/main.js"></script>
-  <div class="animate flex">
-    <aside class="sidebar" id="sidebar">
-      <div class="logo">MiPanel</div>
-      <nav class="menu" id = "menu">
-        <div class="flex">
-          <button id="btn-pause" class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">
+  <div class="flex h-full min-w-0">
+    <aside class="sidebar w-64 shrink-0 border-r border-slate-800 bg-slate-950/90 text-slate-100" id="sidebar">
+      <div class="border-b border-slate-800 bg-slate-900/80 px-5 py-6 text-lg font-bold text-emerald-300">Pydwarfs / partida</div>
+      <nav class="menu flex flex-col gap-4 p-4" id="menu">
+        <div class="grid gap-2 border-b border-slate-800 pb-4">
+          <button id="btn-pause" class="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-left text-sm text-emerald-100 hover:border-emerald-400 hover:bg-emerald-950">
             Pausar
           </button>
-          <button id="btn-continue" class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">
+          <button id="btn-continue" class="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-left text-sm text-emerald-100 hover:border-emerald-400 hover:bg-emerald-950">
             Continuar
           </button>
-          <button id="btn-step" class="w-30 h-8 m-1 gap-1 text-white bg-gray-900">
+          <button id="btn-step" class="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-left text-sm text-emerald-100 hover:border-emerald-400 hover:bg-emerald-950">
             Step
           </button>
         </div>
       </nav>
     </aside>
 
-    <button id="toggleBtn" class="toggle-btn" type="button" title="Mostrar / ocultar barra lateral"
+    <button id="toggleBtn" class="toggle-btn flex h-9 w-9 items-center justify-center rounded border border-slate-700 bg-slate-900 text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950" type="button" title="Mostrar / ocultar barra lateral"
       aria-label="Mostrar / ocultar barra lateral" aria-controls="sidebar" aria-expanded="true">
       <span class="toggle-icon toggle-icon-open" aria-hidden="true">&#9776;</span>
       <span class="toggle-icon toggle-icon-closed" aria-hidden="true">&#9656;</span>

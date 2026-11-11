@@ -48,6 +48,20 @@ class Game(Roar):
         self.Creatures = []
         self.Width = 0
         self.Height = 0
+        self.SelectedMap = -1
+
+    def SelectMap(self, mapa):
+        try:
+            self.SelectedMap = self.Maps.index(mapa)
+        except ValueError:
+            raise ValueError("el mapa no esta cargado")
+
+    def GetSelectedMap(self):
+        if not self.Maps:
+            return None
+        if self.SelectedMap < 0:
+            return self.Maps[0]
+        return self.Maps[self.SelectedMap]
 
     def LoadTerrains(self):
         try:
@@ -196,15 +210,16 @@ class Game(Roar):
                 return it
         
     def IsInsideMap(self, x, y):
-        if not self.Maps:
+        mapa = self.GetSelectedMap()
+        if mapa is None:
             return False
-        grid = self.Maps[0].Grid #TODO: support multiple maps
+        grid = mapa.Grid
         return 0 <= y < len(grid) and 0 <= x < len(grid[y])
 
     def GetObjectAt(self, x,y):
         if not self.IsInsideMap(x, y):
             return None
-        element = self.Maps[0].Grid[y][x] #TODO: support multiple maps
+        element = self.GetSelectedMap().Grid[y][x]
         if isinstance(element, GameObject):
             return element
         return None
@@ -232,7 +247,7 @@ class Game(Roar):
     def GetTerrainAt(self, x,y):
         if not self.IsInsideMap(x, y):
             return None
-        element = self.Maps[0].Grid[y][x] #TODO: support multiple maps
+        element = self.GetSelectedMap().Grid[y][x]
         if isinstance(element, GameTerrain):
             return element
         return self.Terrains[0].copy()
@@ -247,6 +262,7 @@ class Game(Roar):
             "objects": [ob.__dict__() for ob in self.Objects],
             "terrains": [te.__dict__() for te in self.Terrains],
             "maps": [ma.__dict__() for ma in self.Maps],
+            "selectedMap": self.SelectedMap,
             "creatures": [i.__dict__() for i in self.Creatures],
             "runningCreatures": [i.__dict__() for i in self.RunningCreatures]
         }
