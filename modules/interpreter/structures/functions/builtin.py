@@ -18,7 +18,7 @@ builtins = [
 
 class Builtins:
     WaitTempData:dict = None
-    game: "Game" = None
+    game = None
     def __init__(self, game = None):
         self.WaitTempData={}
         self.builtinfuncs = {
@@ -126,24 +126,26 @@ class Builtins:
         if (dx not in (-1, 0, 1) or dy not in (-1, 0, 1) or speed <= 0):
             print(dx, dy, speed)
             raise FuncCallException("move direction must be between -1 and 1")
+        
         for op in args:
             if not OnlyBitmask(op.type , [NUMBER,VARIABLE] ):
                 raise FuncCallException("move arguments must be numbers")
 
         for _ in range(speed):
             xpos = memory.query("x") 
-            xpos.value += dx
             ypos = memory.query("y") 
             ypos.value += dy
-            if (xpos.value < 0 or xpos.value >= self.game.Width or
-                ypos.value < 0 or ypos.value >= self.game.Height):
+            xpos.value += dx
+            if not self.game.IsInsideMap(xpos.value, ypos.value):
                 break
+            
             obj = self.game.GetObjectAt(xpos.value, ypos.value)
             ent = self.game.GetEntityAt(xpos.value, ypos.value)
             if (obj == None) and (ent == None):
                 memory.alloc_const("x", xpos)
                 memory.alloc_const("y", ypos)
             else: 
+                print("error: ",obj, ent)
                 break
         
         return NORMAL, None

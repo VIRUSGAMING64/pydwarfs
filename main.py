@@ -14,7 +14,8 @@ def TestServerCom():
     ser = Server("127.0.0.1", 1200, path)
     routes = Routes(path)
     ser.AddEndpoint("/", routes.hola)
-    ser.AddEndpoint("/<path>", routes.getfile )
+    ser.AddEndpoint("/<path>", routes.getfile)
+    ser.AddEndpoint("/game", routes.getgame)
     print("starting webpage...")
     Thread(target= ser.Run,daemon=True).start()
     print("starting websocks...")
@@ -40,6 +41,7 @@ def InterTest():
         p = g.Step()
         if not p:
             break
+        
 import tests.test_known_bugs as err
 
 if "--web" in sys.argv:

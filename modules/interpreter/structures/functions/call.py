@@ -9,7 +9,7 @@ from modules.interpreter.structures.functions.builtin import *
 from modules.interpreter.memory.memory import Memory
 
 class FuncCall(Structure):
-    args: list[Token]
+    args: list[Token] = None
     def __init__(self, name, args, line):
         if not isinstance(args, list):
             raise Exception("args not is a list")
@@ -23,7 +23,11 @@ class FuncCall(Structure):
         self.data = {}
 
     def copy(self):
-        f = FuncCall(self.name, self.args, self.line)
+        f = FuncCall(
+            self.name,
+            [[token.copy() for token in argument] for argument in self.args],
+            self.line,
+        )
         f.isbuiltin = self.isbuiltin
         return f
         

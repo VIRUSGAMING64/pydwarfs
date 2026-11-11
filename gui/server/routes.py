@@ -20,8 +20,11 @@ class Routes:
     def hola(self):
         return self.getfile("index.html")
 
+    def getgame(self):
+        return self.getfile("game/maingame.html")
+
     def getfile(self,path):  
-        path = os.path.join(self.base_path, path)
+        path = os.path.join(self.base_path, path)    
         try:
             with open(path) as file:
                 return flask.Response(file.read(), mimetype=get_mime_type(path))

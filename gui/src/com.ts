@@ -11,6 +11,7 @@ class CommunicationStatus:
 
 const SHOW = 5,
     ADD = 6,
+    LOAD_MAP=15,
     STEP = 1;
 export default class Communication {
     ws: WebSocket;
@@ -35,6 +36,10 @@ export default class Communication {
         data = JSON.stringify(data)
         return this.Send(String(SHOW) + "__DATA__" + String(data));
     }
+    LoadMap(data = {}){
+        data = JSON.stringify(data)
+        return this.Send(String(LOAD_MAP) + "__DATA__" + String(data));
+    }
     Step(data = {}) {
         data = JSON.stringify(data)
         return this.Send(String(STEP) + "__DATA__" + String(data));
@@ -51,6 +56,7 @@ export default class Communication {
     
     Send(data: string) {
         if (this.ws.OPEN != this.ws.readyState) {
+            console.log("error enviando: ",data)
             return false;
         }
         this.ws.send(data);

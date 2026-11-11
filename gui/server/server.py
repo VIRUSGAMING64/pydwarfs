@@ -14,12 +14,14 @@ class CommunicationStatus:
     SIGKILL = 4
     SHOW = 5
     ADD = 6
+    LOAD_MAP = 15
 
 class WebSockServer:
     websock = None 
     game = None
     def __init__(self, game: Game):
         self.game = game
+        self.CurrMap = None
 
     async def RunWebsocks(self):
         self.websock = await websockets.serve(self.OnConnect, "127.0.0.1", port=9090)
@@ -29,9 +31,12 @@ class WebSockServer:
     async def OnConnect(self, cli: websockets.ServerConnection):
         print("hi: ", cli.latency)
         while cli.state == websockets.State.OPEN:
-            cli_data = await cli.recv()
-            out = self.Action(cli_data)
-            await cli.send(out)
+            try:
+                cli_data = await cli.recv()
+                out = self.Action(cli_data)
+                await cli.send(out)
+            except Exception as e:
+                print(e)
 
     def AddEntity(self,obj):
         obj: dict = json.loads(obj)
@@ -50,6 +55,17 @@ class WebSockServer:
                 c.memory.addrs["y"].value = int(y)
                 self.game.RunningCreatures.append(c)
 
+    def SelectMap(self,name:str):
+        if name == None:
+            raise Exception("un error ahi para despues")
+            #! deuda tecnica
+        name = name.removeprefix("'").removesuffix("\"")
+        for map in self.game.Maps:
+
+            if map.Name == name:
+                self.game.SelectMap(map)
+                return
+
     def Action(self, RawData: str):
         try:
             data = RawData.split("__DATA__")
@@ -61,6 +77,8 @@ class WebSockServer:
             result = "" 
             if code == CommunicationStatus.STEP:
                 self.game.Step()
+            elif code == CommunicationStatus.LOAD_MAP:
+                self.SelectMap(data)
             elif code == CommunicationStatus.SHOW:
                 result = self.game.__dict__()
                 result = json.dumps(result)
@@ -91,7 +109,7 @@ class Server:
 
     
     def AddEndpoint(self, endpoint, callable,arg = []):
-       self.app.add_url_rule(endpoint, view_func=callable,)
+       self.app.add_url_rule(endpoint, view_func=callable)
 
 
     def Run(self):

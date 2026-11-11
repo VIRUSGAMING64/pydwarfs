@@ -3,8 +3,8 @@ from modules.interpreter.structures.functions.builtin import builtins
 
 
 class AstBuilder:
-    Ast:list[Token|Loop|Condition] 
-    labels:dict 
+    Ast:list[Token|Structure] = None 
+    labels:dict  = None
 
     def copy(self):
         a = AstBuilder(None)
