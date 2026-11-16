@@ -13,7 +13,6 @@ DEFAULT_M_PATH = "gamedata/maps"
 DEFAULT_C_PATH = "gamedata/entity"
 GREATER = 2**64 - 1
 
-
 class Roar:
     def __init__(self):
         self.Roars = []
@@ -30,7 +29,7 @@ class Game(Roar):
     Maps:list[GameMap] = None
     Creatures :list[Interpreter] = None
     RunningCreatures: list[Interpreter] = None
-    
+    Logs:list=None
     def __init__(self, m_path = DEFAULT_M_PATH, t_path = DEFAULT_T_PATH, o_path = DEFAULT_O_PATH, c_path = DEFAULT_C_PATH):
         super().__init__()
         os.makedirs(m_path, exist_ok=True)
@@ -46,9 +45,22 @@ class Game(Roar):
         self.Maps = []
         self.RunningCreatures = []
         self.Creatures = []
+        self.Logs = []
         self.Width = 0
         self.Height = 0
         self.SelectedMap = -1
+
+    def LoadLogs(self):
+        if self.Logs == None:
+            self.Logs = []
+        return self.Logs
+
+    def AddLog(self, creature: Interpreter, log: str, isroar: bool):
+        self.Logs.append([creature, log, isroar])
+
+    def ClearCnt(self,cnt:int):
+        self.Logs = self.Logs[:cnt]
+
 
     def SelectMap(self, mapa):
         try:

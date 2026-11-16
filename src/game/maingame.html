@@ -13,7 +13,15 @@
 <body class="h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,_#26343a,_#020617_42rem)] font-sans text-slate-100">
   <script type="module" src="/main.js"></script>
   <div class="flex h-full min-w-0">
-    <aside class="sidebar w-64 shrink-0 border-r border-slate-800 bg-slate-950/90 text-slate-100" id="sidebar">
+    
+    <aside class="slogs h-screen w-64 shrink-0 border-r border-slate-800 bg-slate-950/90 text-slate-100" id="slogs">
+      <div class="border-b border-slate-800 bg-slate-900/80 px-5 py-6 text-lg font-bold text-emerald-300">Pydwarfs logs</div>
+      <nav class="menu flex flex-col gap-4 p-4" id="nlogs">
+        <div class="log gap-2 border-b border-slate-800 pb-4 overflow-scroll" id="logs"></div>
+      </nav>
+    </aside>
+
+    <aside class="sidebar h-screen w-64 shrink-0 border-r border-slate-800 bg-slate-950/90 text-slate-100" id="sidebar">
       <div class="border-b border-slate-800 bg-slate-900/80 px-5 py-6 text-lg font-bold text-emerald-300">Pydwarfs / partida</div>
       <nav class="menu flex flex-col gap-4 p-4" id="menu">
         <div class="grid gap-2 border-b border-slate-800 pb-4">
@@ -36,7 +44,7 @@
       <span class="toggle-icon toggle-icon-closed" aria-hidden="true">&#9656;</span>
     </button>
 
-    <div id="draw"></div>
+    <div id="draw" class="overflow-scroll"></div> 
   </div>
 </body>
 

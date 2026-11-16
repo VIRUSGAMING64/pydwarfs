@@ -48,4 +48,3 @@ if "--web" in sys.argv:
     TestServerCom()
 else:
     InterTest()
-

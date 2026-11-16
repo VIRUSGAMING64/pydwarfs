@@ -154,6 +154,10 @@ class Interpreter:
         a.value += 1
         self.memory.alloc_const("age", a) 
 
+    def X(self):
+        return self.memory.query("x")
+    def Y(self):
+        return self.memory.query("y")
     def Age(self):
         return self.memory.query("age")
         

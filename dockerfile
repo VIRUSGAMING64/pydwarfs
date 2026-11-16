@@ -1,4 +1,4 @@
-FROM python as pydwarf
+FROM python AS pydwarf
 
 WORKDIR /pydwarf
 

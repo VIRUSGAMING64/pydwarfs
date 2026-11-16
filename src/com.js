@@ -8,26 +8,38 @@ class CommunicationStatus:
     SHOW = 5
 
  */
-const SHOW = 5, ADD = 6, LOAD_MAP = 15, STEP = 1;
+const SHOW = 5, ADD = 6, LOAD_LOGS = 7, LOAD_MAP = 15, STEP = 1, FRAME = 8;
 export default class Communication {
     ws;
-    queue;
-    idx;
+    latest;
+    pending;
+    logCursor;
     constructor(host) {
         this.ws = new WebSocket(host);
         this.ws.onclose = this.Closed;
-        this.queue = new Array();
-        this.idx = 0;
+        this.latest = null;
+        this.pending = false;
+        this.logCursor = 0;
         this.ws.onmessage = (e) => {
-            this.queue.push(e);
+            this.latest = e.data;
+            try {
+                const frame = JSON.parse(e.data);
+                if (typeof frame.logCursor === "number") {
+                    this.logCursor = frame.logCursor;
+                }
+            }
+            catch (_) {
+                // Non-frame responses use the legacy protocol.
+            }
+            this.pending = false;
         };
     }
     Closed() {
         console.log("closed");
     }
-    Show(data = {}) {
+    GetLogs(data = {}) {
         data = JSON.stringify(data);
-        return this.Send(String(SHOW) + "__DATA__" + String(data));
+        return this.Send(String(LOAD_LOGS) + "__DATA__" + String(data));
     }
     LoadMap(data = {}) {
         data = JSON.stringify(data);
@@ -36,6 +48,13 @@ export default class Communication {
     Step(data = {}) {
         data = JSON.stringify(data);
         return this.Send(String(STEP) + "__DATA__" + String(data));
+    }
+    Frame(advance = false) {
+        if (this.pending) {
+            return false;
+        }
+        this.pending = true;
+        return this.Send(String(FRAME) + "__DATA__" + JSON.stringify({ advance, logCursor: this.logCursor }));
     }
     AddEntity(name, x, y) {
         let data = {
@@ -48,7 +67,7 @@ export default class Communication {
     }
     Send(data) {
         if (this.ws.OPEN != this.ws.readyState) {
-            console.log("error enviando: ", data);
+            this.pending = false;
             return false;
         }
         this.ws.send(data);
@@ -58,11 +77,11 @@ export default class Communication {
         if (this.ws.OPEN != this.ws.readyState) {
             return false;
         }
-        if (this.queue.length <= this.idx) {
+        if (this.latest == null) {
             return false;
         }
-        let data = this.queue.at(this.queue.length - 1);
-        this.queue = new Array();
+        const data = { data: this.latest };
+        this.latest = null;
         return data;
     }
 }

@@ -1,7 +1,7 @@
-export function RawData(com) {
-    com.Show();
+export function RawData(com, advance = false) {
     let data = com.Recive();
-    if (data.data == undefined) {
+    com.Frame(advance);
+    if (data === false || data.data == undefined) {
         return "";
     }
     return data.data;
@@ -17,4 +17,11 @@ export function GetRunningCreatures(rawstr) {
 export function GetMaps(rawstr) {
     let obj = JSON.parse(rawstr);
     return obj.maps;
+}
+export function GetLogs(rawstr) {
+    let obj = JSON.parse(rawstr);
+    if (!Array.isArray(obj.logs)) {
+        return false;
+    }
+    return obj.logs;
 }

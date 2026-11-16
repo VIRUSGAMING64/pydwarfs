@@ -2,7 +2,7 @@ import Communication from "./com.js"
 import Drawler from "./grid.js"
 import Game from "./game.js";
 
-import { GetCreatures, RawData, GetMaps, GetRunningCreatures} from "./utils.js"; "./utils"
+import { GetCreatures, RawData, GetMaps, GetRunningCreatures, GetLogs} from "./utils.js"; "./utils"
 
 let canvas = document.createElement("canvas");
 
@@ -20,12 +20,26 @@ let BaseGame: Game|null=null
 let conf :Drawler|null = null
 
 function RenderizeScreen(forse = false){
-    let creatures,data, mapa 
-    if (BaseGame == null || !BaseGame.paused || forse){ //* Aqui se hace fetch desde el server
-    data = RawData(com)
+    let creatures,data, mapa  
+    data = RawData(com, BaseGame != null && !BaseGame.paused)
         if (data == ""){
             return false
         }
+    
+    let logs = GetLogs(data)
+    if (logs != false){
+        elem = document.getElementById("logs")
+        for(let u = 0; u < logs.length; u++){
+            let p = document.createElement("p")
+            p.innerText = logs[u].data + String(logs[u].x) + " " + String(logs[u].y)
+            elem?.appendChild(p)
+        }
+        while (elem != null && elem.childElementCount > 100) {
+            elem.removeChild(elem.firstElementChild as ChildNode)
+        }
+    }
+    
+    if (BaseGame == null || !BaseGame.paused || forse){ //* Aqui se hace fetch desde el server
         const maps = GetMaps(data)
         const selectedMap = JSON.parse(data).selectedMap
         mapa = (maps[selectedMap >= 0 ? selectedMap : 0] ?? maps[0]).Grid
@@ -74,21 +88,11 @@ function RenderizeScreen(forse = false){
 
 setInterval(() => {
     if (BaseGame == null){
-    let val = RenderizeScreen(true)
-    while(val) {
-        val = RenderizeScreen(true)
-    }
+        RenderizeScreen(true)
     }else if(!BaseGame?.paused) {
-        BaseGame?.Step(com)
-        let val = RenderizeScreen()
-        while(val) {
-            val = RenderizeScreen()
-        }
+        RenderizeScreen()
     }else{
-        let val = RenderizeScreen(true)
-        while(val) {
-            val = RenderizeScreen(true)
-        }
+        RenderizeScreen(true)
     }
 }, 100/6);
 
@@ -108,11 +112,8 @@ function Step(){
     if (BaseGame == null){
         return
     }
-    BaseGame.Step(com)
-    let val = RenderizeScreen(true)
-    while(val) {
-        val = RenderizeScreen(true)
-    }
+    com.Frame(true)
+    RenderizeScreen(true)
 }
 
 document.getElementById("btn-continue")?.addEventListener("click", Continue);

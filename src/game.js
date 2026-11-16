@@ -6,7 +6,7 @@ export default class Game {
         this.grid = grid;
     }
     DrawGame(mapa, creatures) {
-        if (this.grid == null) {
+        if (this.grid == null || mapa == null) {
             return;
         }
         for (var i = 0; i < mapa.length; i++) {
@@ -53,6 +53,9 @@ export default class Game {
     }
     Step(com) {
         com.Step();
+    }
+    GetLogs(com) {
+        com.GetLogs();
     }
     Place(x, y, obj) {
         if (this.grid == null) {

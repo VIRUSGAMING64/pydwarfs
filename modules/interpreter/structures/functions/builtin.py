@@ -159,12 +159,27 @@ class Builtins:
             raise FuncCallException("Roar argument must be string")
 
         self.game.PostRoar([tmp_roar, x, y])
+        ok = False
+        for c in self.game.RunningCreatures:
+            if c.memory.id == memory.id:
+                ok = True
+                self.game.AddLog(c,tmp_roar.value, True)
+        if ok == False:
+            raise Exception("Deuda tecnica: UNA CRIATURA NONE HACE ROAR")
         return NORMAL, None
 
     def say(self,memory, args):
         cosa = args[0]
         print(cosa.value)
-        #! Aqui falta hacer una notificacion en la gui
+        ok = False
+        for c in self.game.RunningCreatures:
+            if c.memory.id == memory.id:
+                ok = True
+                self.game.AddLog(c,str(cosa.value), False)
+        
+        if ok == False:
+            raise Exception("Deuda tecnica: UNA CRIATURA NONE HACE Say")
+                
         return NORMAL, None
 
     def see(self, memory, args):

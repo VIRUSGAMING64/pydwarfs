@@ -6,15 +6,18 @@ from gui.server.routes import *
 import time
 from modules.game import *
 
+MAX_LOAD_COUNT = 100
+
 
 class CommunicationStatus:
     STEP = 1
     CLOSE = 2
     CONTINUE = 3
     SIGKILL = 4
-    SHOW = 5
     ADD = 6
+    LOAD_LOGS = 7
     LOAD_MAP = 15
+    FRAME = 8
 
 class WebSockServer:
     websock = None 
@@ -55,6 +58,42 @@ class WebSockServer:
                 c.memory.addrs["y"].value = int(y)
                 self.game.RunningCreatures.append(c)
 
+    def Creaturelogs(self):
+        logs = self.game.LoadLogs()
+        r_logs = logs.copy()
+        r_logs.reverse()
+        r_logs = r_logs[:MAX_LOAD_COUNT]
+        t_logs = []
+        for c,log,isroar in r_logs:
+            data = {"x": c.X().value, "y": c.Y().value, "data": log, "roar": isroar}
+            t_logs.append(data)
+        
+        dic = {
+            "isloadlogs": True,
+            "cnt": len(t_logs),
+            "logs": t_logs
+        }
+        return dic
+
+    def Frame(self, data: str):
+        payload = json.loads(data) if data else {}
+        if payload.get("advance", False):
+            self.game.Step()
+
+        logs = self.game.LoadLogs()
+        cursor = max(0, min(int(payload.get("logCursor", 0)), len(logs)))
+        if cursor == 0:
+            cursor = max(0, len(logs) - MAX_LOAD_COUNT)
+        new_logs = []
+        for c, log, isroar in logs[cursor:]:
+            new_logs.append({"x": c.X().value, "y": c.Y().value, "data": log, "roar": isroar})
+
+        result = self.game.__dict__()
+        result["isloadlogs"] = False
+        result["logs"] = new_logs
+        result["logCursor"] = len(logs)
+        return json.dumps(result)
+
     def SelectMap(self,name:str):
         if name == None:
             raise Exception("un error ahi para despues")
@@ -82,12 +121,14 @@ class WebSockServer:
                 self.game.Step()
             elif code == CommunicationStatus.LOAD_MAP:
                 self.SelectMap(data)
-            elif code == CommunicationStatus.SHOW:
-                result = self.game.__dict__()
-                result = json.dumps(result)
             elif code == CommunicationStatus.SIGKILL:
                 result = "KILLED"
                 self.game.kill()
+            elif code == CommunicationStatus.LOAD_LOGS:
+                result = self.Creaturelogs() #* Returns a json with logs {cnt, logs}
+                result = json.dumps(result)
+            elif code == CommunicationStatus.FRAME:
+                result = self.Frame(data)
             elif code == CommunicationStatus.ADD:
                 self.AddEntity(data)
                 result = self.game.__dict__()

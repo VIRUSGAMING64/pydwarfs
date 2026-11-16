@@ -9,7 +9,7 @@ export default class Game {
     this.grid = grid;
   }
   DrawGame(mapa: any, creatures: any) {
-    if (this.grid == null) {
+    if (this.grid == null || mapa == null) {
       return;
     }
     for (var i = 0; i < mapa.length; i++) {
@@ -62,6 +62,9 @@ export default class Game {
 
   Step(com: Communication) {
     com.Step();
+  }
+  GetLogs(com: Communication) {
+    com.GetLogs();
   }
   Place(x: number, y: number, obj: any) {
     if (this.grid == null) {
