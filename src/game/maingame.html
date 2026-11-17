@@ -14,15 +14,15 @@
   <script type="module" src="/main.js"></script>
   <div class="flex h-full min-w-0">
     
-    <aside class="slogs h-screen w-64 shrink-0 border-r border-slate-800 bg-slate-950/90 text-slate-100" id="slogs">
-      <div class="border-b border-slate-800 bg-slate-900/80 px-5 py-6 text-lg font-bold text-emerald-300">Pydwarfs logs</div>
-      <nav class="menu flex flex-col gap-4 p-4" id="nlogs">
-        <div class="log gap-2 border-b border-slate-800 pb-4 overflow-scroll" id="logs"></div>
+    <aside class="slogs flex h-screen min-h-0 w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-950/90 text-slate-100" id="slogs">
+      <div class="shrink-0 border-b border-slate-800 bg-slate-900/80 px-5 py-5 text-lg font-bold text-emerald-300">Pydwarfs logs</div>
+      <nav class="menu flex min-h-0 flex-1 flex-col p-4" id="nlogs">
+        <div class="log min-h-0 flex-1 overflow-y-auto border-b border-slate-800 pr-2" id="logs" aria-live="polite"></div>
       </nav>
     </aside>
 
-    <aside class="sidebar h-screen w-64 shrink-0 border-r border-slate-800 bg-slate-950/90 text-slate-100" id="sidebar">
-      <div class="border-b border-slate-800 bg-slate-900/80 px-5 py-6 text-lg font-bold text-emerald-300">Pydwarfs / partida</div>
+    <aside class="sidebar flex h-screen min-h-0 w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-950/90 text-slate-100" id="sidebar">
+      <div class="shrink-0 border-b border-slate-800 bg-slate-900/80 px-5 py-5 text-lg font-bold text-emerald-300">Pydwarfs / partida</div>
       <nav class="menu flex flex-col gap-4 p-4" id="menu">
         <div class="grid gap-2 border-b border-slate-800 pb-4">
           <button id="btn-pause" class="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-left text-sm text-emerald-100 hover:border-emerald-400 hover:bg-emerald-950">
@@ -39,7 +39,7 @@
     </aside>
 
     <button id="toggleBtn" class="toggle-btn flex h-9 w-9 items-center justify-center rounded border border-slate-700 bg-slate-900 text-emerald-300 hover:border-emerald-400 hover:bg-emerald-950" type="button" title="Mostrar / ocultar barra lateral"
-      aria-label="Mostrar / ocultar barra lateral" aria-controls="sidebar" aria-expanded="true">
+      aria-label="Mostrar / ocultar barras laterales" aria-controls="slogs sidebar" aria-expanded="true">
       <span class="toggle-icon toggle-icon-open" aria-hidden="true">&#9776;</span>
       <span class="toggle-icon toggle-icon-closed" aria-hidden="true">&#9656;</span>
     </button>

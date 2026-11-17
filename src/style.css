@@ -7,17 +7,31 @@ body {
     margin: 0;
 }
 
-.sidebar {
+.sidebar,
+.slogs {
     overflow: hidden;
+    transition: width 180ms ease;
 }
 
-.sidebar.collapsed {
+.sidebar.collapsed,
+.slogs.collapsed {
     width: 0;
     overflow: hidden;
 }
 
-.sidebar > * {
+.sidebar > *,
+.slogs > * {
     min-width: 16rem;
+}
+
+#logs p {
+    margin: 0;
+    border-bottom: 1px solid rgb(30 41 59 / 0.8);
+    padding: 0.55rem 0.25rem;
+    color: rgb(203 213 225);
+    font-size: 0.8rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
 }
 
 .toggle-btn {

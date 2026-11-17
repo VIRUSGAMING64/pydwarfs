@@ -150,7 +150,7 @@ class Game(Roar):
                     print(f"Error loading creature [{e}] in {pth}")
                     raise e
 
-    def GetPerseption(self, c: Interpreter):
+    def GetPerseption(self, c: Interpreter, roars=None):
         minAdis = GREATER #* no creo q vayan hacer un mapa tan grande
         allx = 0
         ally = 0
@@ -194,7 +194,9 @@ class Game(Roar):
 
         roars_near = 0
         last_roar = ""
-        for ro,rx,ry in self.Roars:
+        if roars is None:
+            roars = self.Roars
+        for ro,rx,ry in roars:
             vx = rx.value
             vy = ry.value
             ris = p2dist(vx,vy, currx,curry)
@@ -213,7 +215,6 @@ class Game(Roar):
         c.memory.alloc_const("allies_near", Token(allys, NUMBER))
         c.memory.alloc_const("enemies_near", Token(enemis, NUMBER))
         self.Roars = []
-
     def GetEntityAt(self,x,y):
         for it in self.RunningCreatures:
             t_x = it.memory.query("x").value
@@ -248,9 +249,11 @@ class Game(Roar):
 
     def Step(self):
         p = False
+        roars = self.Roars
+        self.Roars = []
         for idx in RandPermutation(0, len(self.RunningCreatures)-1, len(self.RunningCreatures), time.time_ns()):
             creature = self.RunningCreatures[idx]
-            self.GetPerseption(creature)
+            self.GetPerseption(creature, roars)
             p|=creature.Step()
             creature.ReduceLifespan()
         self.Clean()

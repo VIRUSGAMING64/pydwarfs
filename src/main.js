@@ -112,7 +112,10 @@ document.getElementById("btn-pause")?.addEventListener("click", Pause);
 document.getElementById("btn-step")?.addEventListener("click", Step);
 const toggleBtn = document.getElementById('toggleBtn');
 const sidebar = document.getElementById('sidebar');
-// Añadir evento de clic al botón
+const logsSidebar = document.getElementById('slogs');
 toggleBtn?.addEventListener('click', () => {
     sidebar?.classList.toggle('collapsed');
+    logsSidebar?.classList.toggle('collapsed');
+    const isCollapsed = sidebar?.classList.contains('collapsed') ?? false;
+    toggleBtn.setAttribute('aria-expanded', String(!isCollapsed));
 });
